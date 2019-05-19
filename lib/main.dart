@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -20,37 +19,58 @@ class MyApp extends StatelessWidget {
 class FirstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final gameCodeInputController = new TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Game Frame'),
+        title: Text('Carolina Ignites'),
       ),
       body: Center(
-        child: RaisedButton(
+        child: Column(
+          children: [ new Text("To play a game, enter the game's code:"),
+          TextField(
+            decoration: 
+              InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Type Here!'
+              ),
+            controller: gameCodeInputController
+          ),
+          RaisedButton(
           child: Text('Launch Game'),
           onPressed: () {
-            Navigator.push(
+            if(gameCodeInputController.text.length > 0)
+            {
+              Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SecondScreen()),
+              MaterialPageRoute(builder: (context) => GameScreen(gameCode: gameCodeInputController.text)),
             );
+            }
+            
           },
-        ),
-      ),
+        )]
+        )
+      )
     );
   }
 }
 
-class SecondScreen extends StatelessWidget {
+class GameScreen extends StatelessWidget {
   
+  final String gameCode;
+
+  //constructor
+  GameScreen({Key key, @required this.gameCode}): super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    print("yes");
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
+  ]);
 
-    ]);
     return WebviewScaffold(
-      url: "https://api.carolinaignites.org/app/zoc88PV1WPnIstPx",
+      url: "https://api.carolinaignites.org/app/" + this.gameCode,
       appBar: new AppBar(
         title: new Text("Widget WebView"),
       ), 
