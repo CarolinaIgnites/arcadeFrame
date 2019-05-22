@@ -4,6 +4,8 @@ PODS:
     - Flutter
   - native_device_orientation (0.0.1):
     - Flutter
+  - path_provider (0.0.1):
+    - Flutter
   - webview_flutter (0.0.1):
     - Flutter
 
@@ -11,6 +13,7 @@ DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - native_device_orientation (from `.symlinks/plugins/native_device_orientation/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 EXTERNAL SOURCES:
@@ -20,6 +23,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_webview_plugin/ios"
   native_device_orientation:
     :path: ".symlinks/plugins/native_device_orientation/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
   webview_flutter:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
@@ -27,6 +32,7 @@ SPEC CHECKSUMS:
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   native_device_orientation: e24d00be281de72996640885d80e706142707660
+  path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   webview_flutter: 1aa7604e6cdb451a9b7ed2c37d5454c0b440246b
 
 PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
