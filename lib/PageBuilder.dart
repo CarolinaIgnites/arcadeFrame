@@ -9,7 +9,7 @@ class PageBuilder {
 		return _singleton;
 	}
 
-
+	/*
 	Future<String> buildHTMLFile(String gameHTML) async {
 		var boiler = "";
 		try {
@@ -20,14 +20,14 @@ class PageBuilder {
 	      	return "0"; //error
 	    }
 	    return boiler;
-	    /*
+	    
 		int beginBody = boiler.lastIndexOf("<body>") + 6;
 		int endBody = boiler.indexOf('<script src="https://www.carolinaignites.org/assets/js/gameframe.js"></script>') - 1;
 		String begin = boiler.substring(0, beginBody + 1);
 		String end = boiler.substring(endBody);
 		return begin + gameHTML + end;
-		*/
-	}
+		
+	} */
 
 	Future<String> getJSBoiler() async {
 		var boiler = "";
@@ -42,7 +42,7 @@ class PageBuilder {
 	}
 
 
-
+	/*
 	Future<String> buildJSFile(String gameJS) async {
 		var boiler = "";
 		try {
@@ -57,7 +57,7 @@ class PageBuilder {
 		String begin = boiler.substring(0, beginScript);
 		String end = boiler.substring(endScript);
 		return begin + gameJS + end;
-	}
+	} */
 
 	PageBuilder._internal();
 }

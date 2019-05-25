@@ -6,14 +6,11 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:async/async.dart';
 import 'dart:convert';
-
 import 'package:flutter/scheduler.dart';
-
+import 'package:auto_orientation/auto_orientation.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:http/http.dart' as http;
-
 import "PageBuilder.dart";
 
 void main() => runApp(new MyApp());
@@ -247,9 +244,7 @@ class GameScreen extends StatefulWidget {
 class GameScreenState extends State<GameScreen> {
   final flutterWebViewPlugin = FlutterWebviewPlugin();
   final AsyncMemoizer _memoizer = AsyncMemoizer();
-  var HTML = "<html></html>";
-  var JS;
-  var meta;
+ 
 
   //function to get the data field of the gameframe game
   Future<String> getWebPacket(String code) async {
@@ -265,101 +260,69 @@ class GameScreenState extends State<GameScreen> {
     String data = utf8.decode(base64.decode(body["data"]));
     print("ENDgetWebPacket");
     return data;
-  }
 
-  testFunc() { return this._memoizer.runOnce(()async {
-    print("asdfsf");
-  });}
 
-  Future launchGame(String JS) async {
-    print("Launch game");
-
-    /*
-    await getWebPacket(widget.gameCode).then((data) {
-      var packet = json.decode(data);
+    //code for reading webpacket, could be used later.
+    /*var packet = json.decode(data);
       var hashedHTML =packet['html'];
       HTML =  utf8.decode(base64.decode(hashedHTML));
       var hashedJS = packet['code'];
       JS = utf8.decode(base64.decode(hashedJS));
       var hashedMeta = packet['meta'];
       //meta = utf8.decode(base64.decode(hashedMeta));
-      print(packet);
+      print(packet); */ 
+  }
+
+  launchGame() { 
+    return this._memoizer.runOnce(() async {
+      var pageBuilder = PageBuilder();
+      String jsScript = await pageBuilder.getJSBoiler();
+      String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
+      await flutterWebViewPlugin.evalJavascript(jsScriptWithLookup); 
+      setState(() {});
     });
-    
-*/
-    var pageBuilder = PageBuilder();
-   // String page = await pageBuilder.buildHTMLFile(HTML);
-   /*
-   await flutterWebViewPlugin.launch(
-      'https://khalid.carolinaignites.org',
-      rect: Rect.fromLTWH(0.0, 0.0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height-300),
-      withZoom: false,
-      withJavascript: true
-    ); */ 
-    String jsScript = await pageBuilder.getJSBoiler();
-    String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
-    //print(jsScriptWithLookup);
-    //await flutterWebViewPlugin.evalJavascript(jsScriptWithLookup); 
-    print("ENDlaunchGame");
-
-    await flutterWebViewPlugin.evalJavascript("document.body.innerHTML = 'bla bla'");
-
-    setState(() {});
-
   }
 
   @override
   void initState() {
     //get JS from webpacket
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) => launchGame("sdf"));
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    AutoOrientation.landscapeRightMode();
+    //SchedulerBinding.instance.addPostFrameCallback((_) => launchGame());
 
   }
 
   @override
   Widget build(BuildContext context) {
-    /*SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);*/
     print("Build");
-
     return new Container(
-        child: FutureBuilder(
-            future: testFunc(),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              print(snapshot.connectionState);
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  return new Text('Input a URL to start');
-                case ConnectionState.waiting:
-                  return new Center(child: new CircularProgressIndicator());
-                case ConnectionState.active:
-                  return new Text('');
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    return new Text(
-                      '${snapshot.error}',
-                      style: TextStyle(color: Colors.red),
-                    );
-                  } else {
-                    return new WebviewScaffold(
-                      url: "https://khalid.carolinaignites.org/",
-                      withZoom: false,
-                      withJavascript: true,
-                      appBar: new AppBar(
-                        title: new Text("Widget WebView"),
-                      ),
-                    );
-                    print("endbuild");
-                  }
-              }
-            }));
+      child: new WebviewScaffold(
+            url: "https://www.carolinaignites.org/assets/html/mobileBoiler.html", 
+            withZoom: false,
+            withJavascript: true,
+            scrollBar: false,
+            appBar: new AppBar(
+              title: new Text("Widget WebView"),
+              actions: <Widget>[
+                  IconButton(
+      icon: Icon(Icons.playlist_play),
+      onPressed: () { launchGame();},
+    )]),
+    ));
   }
 
   @override
   void dispose() {
     flutterWebViewPlugin.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    AutoOrientation.portraitUpMode();
     super.dispose();
   }
 }

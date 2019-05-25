@@ -1,4 +1,16 @@
-<script type="text/javascript">
+{ 
+
+document.documentElement.style.margin = "0";
+document.documentElement.style.height = "100%";
+document.documentElement.style.overflow = "hidden";
+document.documentElement.style.position = "fixed";
+
+document.body.style.margin = "0";
+document.body.style.height = "100%";
+document.body.style.overflow = "hidden";
+document.body.style.position = "fixed";
+
+
 let lookup = window.location.pathname.split('/')[2];
 
 
@@ -34,8 +46,7 @@ var code = "console.error('Nothing to run!!')";
           // return src
         },
     };
-</script>
-<script type="text/javascript">
+
 (()=>{
 var data = {
   meta: meta
@@ -77,5 +88,4 @@ fetch("https://api.carolinaignites.org/" + lookup).then((response)=>{
     );
 })
 };
-})()
-</script>
+})() }
