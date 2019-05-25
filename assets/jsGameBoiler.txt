@@ -1,0 +1,81 @@
+<script type="text/javascript">
+let lookup = window.location.pathname.split('/')[2];
+
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function(registration) {
+        console.log('Service worker registration succeeded:', registration);
+    }, function(error) {
+        console.log('Service worker registration failed:', error);
+    });
+} else {
+    console.log('Service workers are not supported.');
+}
+
+var code = "console.error('Nothing to run!!')";
+    let image_lookup = {};
+    let meta = {
+        debug: false,
+        external_cache: function(key, value) {
+          // Interact with Service worker cache potentially.
+          // caches.open(lookup).then(function(cache) {
+          //  cache.put(key, value);
+          // });
+        },
+        cache_proxy: function(src, key) {
+          // Obviously make this endpoint.
+          // Should check cache, and if cache fails, it should then stream.
+          let lookup = src.split("gf://")[1];
+          if (lookup in image_lookup) {
+            src = image_lookup[lookup];
+          }
+          return "https://api.carolinaignites.org/cors/" + src;
+          // Uncomment this line if coors doesn't work.
+          // return src
+        },
+    };
+</script>
+<script type="text/javascript">
+(()=>{
+var data = {
+  meta: meta
+}; // Init defaults
+let parse = function(hash) {
+let raw = window.atob(hash);
+let container = document.querySelector("#container");
+let old_data = data;
+data = JSON.parse(raw)
+meta = Object.assign({}, data["meta"], meta);
+code = window.atob(data["code"]);
+image_lookup = JSON.parse(window.atob(data["images"]));
+container.innerHTML = window.atob(
+  data["html"]);
+}
+if (lookup.length > 1) {
+fetch("https://api.carolinaignites.org/" + lookup).then((response)=>{
+    return response.json();
+}).then((d)=>{
+    if (d['valid']) parse(d['data']);
+    new GameFrame(meta,
+        function(gf) {
+            let collision = gf.collision;
+            let gameOver = gf.gameOver;
+            let score = gf.score;
+            let remove = gf.remove;
+            let registerKeys = gf.registerKeys;
+            let registerLoops = gf.registerLoops;
+            let template = gf.template;
+            try {
+                eval(code);
+            } catch (e) {
+                var err = e.constructor(e.message);
+                err.lineNumber = e.lineNumber - err.lineNumber + 3;
+                console.error(err);
+                throw err;
+            }
+        }
+    );
+})
+};
+})()
+</script>
