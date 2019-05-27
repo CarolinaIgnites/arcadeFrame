@@ -115,21 +115,21 @@ class HomeScreenState extends State<HomeScreen> {
         body: Container(
             color: Color(0xFF73000a),
             child: Padding(
-                padding: EdgeInsets.all(50),
+                padding: EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.1),
                 child: Column(children: [
                   Padding(
-                      padding: EdgeInsets.only(right: 0),
+                      padding: EdgeInsets.only(left: 20),
                       child: Row(children: [
                         Column(children: [
                           Row(children: <Widget>[
                             new Text('Arcade ',
                                 style: TextStyle(
-                                    fontSize: 30,
+                                    fontSize: MediaQuery.of(context).size.width * 0.075,
                                     fontFamily: "arcadeclassic",
                                     color: Colors.white)),
                             new Text('Frame',
                                 style: TextStyle(
-                                    fontSize: 55,
+                                    fontSize:MediaQuery.of(context).size.width * 0.1,
                                     fontFamily: "arcadeclassic",
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold))
@@ -139,19 +139,19 @@ class HomeScreenState extends State<HomeScreen> {
                           Padding(
                               padding: EdgeInsets.only(bottom: 0),
                               child: IconButton(
-                                iconSize: 30,
+                                iconSize: MediaQuery.of(context).size.width * 0.1,
                                 icon:
                                     new Image.asset("assets/icons/gamepad.png"),
                               ))
                         ])
                       ])),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 30)),
+                  Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                   Padding(
                       padding: EdgeInsets.all(16.0),
                       child: new Text(
                           "To play a game, enter the game's code below:",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: MediaQuery.of(context).size.width * 0.05,
                               color: Colors.white,
                               fontWeight: FontWeight.bold))),
                   Padding(
@@ -195,7 +195,7 @@ class HomeScreenState extends State<HomeScreen> {
                   Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                   new Text("Games Played:",
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: MediaQuery.of(context).size.width * 0.05,
                           color: Colors.white,
                           fontWeight: FontWeight.bold)),
                   new ListView.builder(
@@ -242,25 +242,19 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
-  final flutterWebViewPlugin = FlutterWebviewPlugin();
-  final AsyncMemoizer _memoizer = AsyncMemoizer();
- 
+  final flutterWebViewPlugin = FlutterWebviewPlugin(); 
 
   //function to get the data field of the gameframe game
   Future<String> getWebPacket(String code) async {
-    print("getWebPacket");
     http.Response response = await http.get(
         Uri.encodeFull("https://api.carolinaignites.org/" + code),
         headers: {
           //if your api require key then pass your key here as well e.g "key": "my-long-key"
           "Accept": "application/json"
         });
-    //List data = json.decode(response.body);
     var body = json.decode(response.body);
     String data = utf8.decode(base64.decode(body["data"]));
-    print("ENDgetWebPacket");
     return data;
-
 
     //code for reading webpacket, could be used later.
     /*var packet = json.decode(data);
@@ -273,15 +267,16 @@ class GameScreenState extends State<GameScreen> {
       print(packet); */ 
   }
 
-  launchGame() { 
-    return this._memoizer.runOnce(() async {
-      var pageBuilder = PageBuilder();
-      String jsScript = await pageBuilder.getJSBoiler();
-      String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
-      await flutterWebViewPlugin.evalJavascript(jsScriptWithLookup); 
+  Future launchGame() async { 
+    var pageBuilder = PageBuilder();
+    String jsScript = await pageBuilder.getJSBoiler();
+    String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
+    var future = new Future.delayed(const Duration(milliseconds: 2500), () {
+      flutterWebViewPlugin.evalJavascript(jsScriptWithLookup); 
       setState(() {});
     });
   }
+  
 
   @override
   void initState() {
@@ -292,27 +287,28 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeLeft,
     ]);
     AutoOrientation.landscapeRightMode();
-    //SchedulerBinding.instance.addPostFrameCallback((_) => launchGame());
+    SchedulerBinding.instance.addPostFrameCallback((_) => launchGame());
 
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Build");
     return new Container(
-      child: new WebviewScaffold(
+      color: Colors.white,
+      child: Padding(padding: EdgeInsets.symmetric(horizontal: 10),
+        child:new WebviewScaffold(
             url: "https://www.carolinaignites.org/assets/html/mobileBoiler.html", 
             withZoom: false,
             withJavascript: true,
             scrollBar: false,
-            appBar: new AppBar(
+           /* appBar: new AppBar(
               title: new Text("Widget WebView"),
               actions: <Widget>[
                   IconButton(
       icon: Icon(Icons.playlist_play),
       onPressed: () { launchGame();},
-    )]),
-    ));
+    )]),*/
+    )));
   }
 
   @override

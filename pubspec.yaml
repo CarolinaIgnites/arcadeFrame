@@ -68,7 +68,6 @@ flutter:
 
   assets:
     - assets/icons/gamepad.png
-    - assets/htmlGameBoiler.txt
     - assets/jsGameBoiler.txt
   fonts:
     - family: arcadeclassic
