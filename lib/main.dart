@@ -38,7 +38,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-
     getSavedGames().then((result) {
       setState(() {
         savedGames = result;
@@ -115,15 +114,15 @@ class HomeScreenState extends State<HomeScreen> {
     final bool isLandscape = orientation == Orientation.landscape;
 
     if (isLandscape) {
-      return Scaffold(
-        body: Container(color: Color(0xFF73000a)));
+      return Scaffold(body: Container(color: Color(0xFF73000a)));
     }
 
     return Scaffold(
         body: Container(
             color: Color(0xFF73000a),
             child: Padding(
-                padding: EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.1),
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.width * 0.1),
                 child: Column(children: [
                   Padding(
                       padding: EdgeInsets.only(left: 20),
@@ -132,12 +131,15 @@ class HomeScreenState extends State<HomeScreen> {
                           Row(children: <Widget>[
                             new Text('Arcade ',
                                 style: TextStyle(
-                                    fontSize: MediaQuery.of(context).size.width * 0.075,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.075,
                                     fontFamily: "arcadeclassic",
                                     color: Colors.white)),
                             new Text('Frame',
                                 style: TextStyle(
-                                    fontSize:MediaQuery.of(context).size.width * 0.1,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width * 0.1,
                                     fontFamily: "arcadeclassic",
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold))
@@ -147,7 +149,8 @@ class HomeScreenState extends State<HomeScreen> {
                           Padding(
                               padding: EdgeInsets.only(bottom: 0),
                               child: IconButton(
-                                iconSize: MediaQuery.of(context).size.width * 0.1,
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.1,
                                 icon:
                                     new Image.asset("assets/icons/gamepad.png"),
                               ))
@@ -159,19 +162,21 @@ class HomeScreenState extends State<HomeScreen> {
                       child: new Text(
                           "To play a game, enter the game's code below:",
                           style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width * 0.05,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.05,
                               color: Colors.white,
                               fontWeight: FontWeight.bold))),
                   Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
+                          style: TextStyle(color: Colors.white),
                           decoration: new InputDecoration(
                               enabledBorder: new OutlineInputBorder(
                                   borderSide: new BorderSide(
                                       color: Colors.white, width: 2.0)),
                               focusedBorder: new OutlineInputBorder(
                                   borderSide: new BorderSide(
-                                      color: Colors.black, width: 2.0)),
+                                      color: Colors.white, width: 2.0)),
                               hintText: 'Check the Editor URL',
                               labelText: 'Game Code',
                               prefixIcon: const Icon(
@@ -250,7 +255,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
-  final flutterWebViewPlugin = FlutterWebviewPlugin(); 
+  final flutterWebViewPlugin = FlutterWebviewPlugin();
 
   WebViewController _controller;
 
@@ -274,17 +279,17 @@ class GameScreenState extends State<GameScreen> {
       JS = utf8.decode(base64.decode(hashedJS));
       var hashedMeta = packet['meta'];
       //meta = utf8.decode(base64.decode(hashedMeta));
-      print(packet); */ 
+      print(packet); */
   }
 
-  Future _launchGame(String value) async { 
+  Future _launchGame(String value) async {
     var pageBuilder = PageBuilder();
     String jsScript = await pageBuilder.getJSBoiler();
-    String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
-    _controller.evaluateJavascript(jsScriptWithLookup); 
+    String jsScriptWithLookup = jsScript.replaceAll(
+        "window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
+    _controller.evaluateJavascript(jsScriptWithLookup);
     //setState(() {});
   }
-  
 
   @override
   void initState() {
@@ -300,13 +305,13 @@ class GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return new WebView(
-      initialUrl:"https://www.carolinaignites.org/assets/html/mobileBoiler.html",
-      javascriptMode: JavascriptMode.unrestricted,
-      onWebViewCreated: (WebViewController c) {
-        _controller = c;
-      },
-      onPageFinished: _launchGame
-    );
+        initialUrl:
+            "https://www.carolinaignites.org/assets/html/mobileBoiler.html",
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController c) {
+          _controller = c;
+        },
+        onPageFinished: _launchGame);
   }
 
   @override
