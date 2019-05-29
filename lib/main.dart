@@ -38,6 +38,10 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ]);
     getSavedGames().then((result) {
       setState(() {
         savedGames = result;
@@ -244,6 +248,8 @@ class GameScreen extends StatefulWidget {
 class GameScreenState extends State<GameScreen> {
   final flutterWebViewPlugin = FlutterWebviewPlugin(); 
 
+  WebViewController _controller;
+
   //function to get the data field of the gameframe game
   Future<String> getWebPacket(String code) async {
     http.Response response = await http.get(
@@ -267,14 +273,12 @@ class GameScreenState extends State<GameScreen> {
       print(packet); */ 
   }
 
-  Future launchGame() async { 
+  Future _launchGame(String value) async { 
     var pageBuilder = PageBuilder();
     String jsScript = await pageBuilder.getJSBoiler();
     String jsScriptWithLookup = jsScript.replaceAll("window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
-    var future = new Future.delayed(const Duration(milliseconds: 2500), () {
-      flutterWebViewPlugin.evalJavascript(jsScriptWithLookup); 
-      setState(() {});
-    });
+    _controller.evaluateJavascript(jsScriptWithLookup); 
+    //setState(() {});
   }
   
 
@@ -287,39 +291,29 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeLeft,
     ]);
     AutoOrientation.landscapeRightMode();
-    SchedulerBinding.instance.addPostFrameCallback((_) => launchGame());
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      color: Colors.white,
-      child: Padding(padding: EdgeInsets.symmetric(horizontal: 10),
-        child:new WebviewScaffold(
-            url: "https://www.carolinaignites.org/assets/html/mobileBoiler.html", 
-            withZoom: false,
-            withJavascript: true,
-            scrollBar: false,
-           /* appBar: new AppBar(
-              title: new Text("Widget WebView"),
-              actions: <Widget>[
-                  IconButton(
-      icon: Icon(Icons.playlist_play),
-      onPressed: () { launchGame();},
-    )]),*/
-    )));
+    return new WebView(
+      initialUrl:"https://www.carolinaignites.org/assets/html/mobileBoiler.html",
+      javascriptMode: JavascriptMode.unrestricted,
+      onWebViewCreated: (WebViewController c) {
+        _controller = c;
+      },
+      onPageFinished: _launchGame
+    );
   }
 
   @override
   void dispose() {
+    super.dispose();
     flutterWebViewPlugin.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     AutoOrientation.portraitUpMode();
-    super.dispose();
   }
 }
 

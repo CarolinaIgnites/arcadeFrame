@@ -9,7 +9,7 @@ document.body.style.margin = "0";
 document.body.style.height = "100%";
 document.body.style.overflow = "hidden";
 document.body.style.position = "fixed";
-
+document.body.style.backgroundColor = "black";
 
 let lookup = window.location.pathname.split('/')[2];
 
