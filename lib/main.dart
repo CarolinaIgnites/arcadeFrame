@@ -38,10 +38,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown
-    ]);
+
     getSavedGames().then((result) {
       setState(() {
         savedGames = result;
@@ -114,6 +111,13 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final gameCodeInputController = new TextEditingController();
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    final bool isLandscape = orientation == Orientation.landscape;
+
+    if (isLandscape) {
+      return Scaffold(
+        body: Container(color: Color(0xFF73000a)));
+    }
 
     return Scaffold(
         body: Container(
