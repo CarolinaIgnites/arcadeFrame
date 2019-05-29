@@ -4,11 +4,14 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:async/async.dart';
 import 'dart:convert';
+import 'package:flutter/scheduler.dart';
+import 'package:auto_orientation/auto_orientation.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:http/http.dart' as http;
+import "PageBuilder.dart";
 
 void main() => runApp(new MyApp());
 
@@ -16,9 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: HomeScreen(),
-      theme: ThemeData(fontFamily: 'Helvetica') //default font for entire app
-    );
+        home: HomeScreen(),
+        theme: ThemeData(fontFamily: 'Helvetica') //default font for entire app
+        );
   }
 }
 
@@ -107,66 +110,89 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final gameCodeInputController = new TextEditingController();
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    final bool isLandscape = orientation == Orientation.landscape;
+
+    if (isLandscape) {
+      return Scaffold(body: Container(color: Color(0xFF73000a)));
+    }
 
     return Scaffold(
         body: Container(
             color: Color(0xFF73000a),
             child: Padding(
-                padding: EdgeInsets.all(50),
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.width * 0.1),
                 child: Column(children: [
-                  Padding(padding: EdgeInsets.only(right: 0), child:
-                  Row( children: [
-                    Column(children: [
-                      Row(children:<Widget>[
-                  new Text('Arcade ',
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontFamily: "arcadeclassic",
-                          color: Colors.white
-                          )), new Text('Frame',
-                      style: TextStyle(
-                          fontSize: 55,
-                          fontFamily: "arcadeclassic",
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold))]),
-                      
-                    ]),
-                     Column(children: [                   
-                      Padding(
-                      padding: EdgeInsets.only(bottom: 0),
-                      child: IconButton(
-                        iconSize: 30,
-                        icon: new Image.asset("assets/icons/gamepad.png"),
-                      ))])
-                   ])),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 30)), 
+                  Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Row(children: [
+                        Column(children: [
+                          Row(children: <Widget>[
+                            new Text('Arcade ',
+                                style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.075,
+                                    fontFamily: "arcadeclassic",
+                                    color: Colors.white)),
+                            new Text('Frame',
+                                style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    fontFamily: "arcadeclassic",
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold))
+                          ]),
+                        ]),
+                        Column(children: [
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 0),
+                              child: IconButton(
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                icon:
+                                    new Image.asset("assets/icons/gamepad.png"),
+                              ))
+                        ])
+                      ])),
+                  Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                   Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: new Text("To play a game, enter the game's code below:", 
+                      child: new Text(
+                          "To play a game, enter the game's code below:",
                           style: TextStyle(
-                              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold))),
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.05,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold))),
                   Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
+                          style: TextStyle(color: Colors.white),
                           decoration: new InputDecoration(
                               enabledBorder: new OutlineInputBorder(
-                                  borderSide:
-                                      new BorderSide( color: Colors.white, width: 2.0)),
+                                  borderSide: new BorderSide(
+                                      color: Colors.white, width: 2.0)),
                               focusedBorder: new OutlineInputBorder(
-                                  borderSide:
-                                      new BorderSide( color: Colors.black, width: 2.0)),
+                                  borderSide: new BorderSide(
+                                      color: Colors.white, width: 2.0)),
                               hintText: 'Check the Editor URL',
                               labelText: 'Game Code',
                               prefixIcon: const Icon(
                                 Icons.code,
                                 color: Colors.white,
                               ),
-                              labelStyle:
-                                  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), hintStyle: const TextStyle(color: Colors.white)),
+                              labelStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                              hintStyle: const TextStyle(color: Colors.white)),
                           controller: gameCodeInputController)),
                   RaisedButton(
                     color: Colors.white,
-                    child: Text('Launch Game', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    child: Text('Launch Game',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold)),
                     onPressed: () {
                       if (gameCodeInputController.text.length > 0) {
                         addCode(gameCodeInputController.text);
@@ -179,9 +205,12 @@ class HomeScreenState extends State<HomeScreen> {
                       }
                     },
                   ),
-                  Padding(padding:EdgeInsets.symmetric(vertical: 10)),
-                  new Text("Games Played:", style:TextStyle(
-                              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                  Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                  new Text("Games Played:",
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.05,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
                   new ListView.builder(
                       padding: EdgeInsets.all(0.0),
                       scrollDirection: Axis.vertical,
@@ -197,9 +226,14 @@ class HomeScreenState extends State<HomeScreen> {
                       }),
                   new RaisedButton(
                       color: Colors.white,
-                      child: Text("Clear Games", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      child: Text("Clear Games",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
                       onPressed: () {
-                        clearGames();
+                        clearGames().then((e) {
+                          setState(() {});
+                        });
                       })
                 ]))));
   }
@@ -221,6 +255,10 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
+  final flutterWebViewPlugin = FlutterWebviewPlugin();
+
+  WebViewController _controller;
+
   //function to get the data field of the gameframe game
   Future<String> getWebPacket(String code) async {
     http.Response response = await http.get(
@@ -229,28 +267,64 @@ class GameScreenState extends State<GameScreen> {
           //if your api require key then pass your key here as well e.g "key": "my-long-key"
           "Accept": "application/json"
         });
-    //List data = json.decode(response.body);
     var body = json.decode(response.body);
     String data = utf8.decode(base64.decode(body["data"]));
     return data;
+
+    //code for reading webpacket, could be used later.
+    /*var packet = json.decode(data);
+      var hashedHTML =packet['html'];
+      HTML =  utf8.decode(base64.decode(hashedHTML));
+      var hashedJS = packet['code'];
+      JS = utf8.decode(base64.decode(hashedJS));
+      var hashedMeta = packet['meta'];
+      //meta = utf8.decode(base64.decode(hashedMeta));
+      print(packet); */
+  }
+
+  Future _launchGame(String value) async {
+    var pageBuilder = PageBuilder();
+    String jsScript = await pageBuilder.getJSBoiler();
+    String jsScriptWithLookup = jsScript.replaceAll(
+        "window.location.pathname.split('/')[2]", "'" + widget.gameCode + "'");
+    _controller.evaluateJavascript(jsScriptWithLookup);
+    //setState(() {});
+  }
+
+  @override
+  void initState() {
+    //get JS from webpacket
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    AutoOrientation.landscapeRightMode();
   }
 
   @override
   Widget build(BuildContext context) {
-    /*SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);*/
+    return new WebView(
+        initialUrl:
+            "https://www.carolinaignites.org/assets/html/mobileBoiler.html",
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController c) {
+          _controller = c;
+        },
+        onPageFinished: _launchGame);
+  }
 
-    return WebviewScaffold(
-      url: "https://api.carolinaignites.org/app/" +
-          widget
-              .gameCode, //widget."field" is how you access inherited variables...
-      appBar: new AppBar(
-        title: new Text("Widget WebView"),
-      ),
-    );
+  @override
+  void dispose() {
+    super.dispose();
+    flutterWebViewPlugin.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    AutoOrientation.portraitUpMode();
   }
 }
+
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

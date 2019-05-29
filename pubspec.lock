@@ -2,12 +2,19 @@
 # See https://www.dartlang.org/tools/pub/glossary#lockfile
 packages:
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  auto_orientation:
+    dependency: "direct main"
+    description:
+      name: auto_orientation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -190,7 +197,7 @@ packages:
       name: webview_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2"
+    version: "0.3.7+1"
 sdks:
   dart: ">=2.2.0 <3.0.0"
   flutter: ">=0.11.9 <2.0.0"
