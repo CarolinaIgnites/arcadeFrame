@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -308,6 +310,11 @@ class GameScreenState extends State<GameScreen> {
         initialUrl:
             "https://www.carolinaignites.org/assets/html/mobileBoiler.html",
         javascriptMode: JavascriptMode.unrestricted,
+        gestureRecognizers: Set()
+          ..add(Factory<VerticalDragGestureRecognizer>(
+            () => VerticalDragGestureRecognizer()))
+        ..add(Factory<HorizontalDragGestureRecognizer>(
+                () => HorizontalDragGestureRecognizer())),
         onWebViewCreated: (WebViewController c) {
           _controller = c;
         },
