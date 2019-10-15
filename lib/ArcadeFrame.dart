@@ -62,10 +62,10 @@ class HomeScreenState extends State<HomeScreen> {
   // but I think to get to that point is pretty slow, so we should be good.
   Future saveGame(Game game) async {
     game.plays += 1;
-    if (!game.saved) {
-      return db.newGame(game);
+    if (game.saved) {
+      return db.updateGame(game);
     }
-    return db.updateGame(game);
+    return db.newGame(game);
   }
 
   Future getDefaultGames() async {

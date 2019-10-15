@@ -39,7 +39,7 @@ class Game {
         description: json["description"],
         highscore: json["highscore"],
         plays: json["plays"],
-        favourited: json["favourited"],
+        favourited: json["favourited"] == 1,
         saved: true,
       );
 
