@@ -51,5 +51,6 @@ class Game {
         "highscore": highscore,
         "plays": plays,
         "favourited": favourited,
+        "saved": saved,
       };
 }
