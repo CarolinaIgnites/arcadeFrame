@@ -70,7 +70,7 @@ class GameScreenState extends State<GameScreen> {
               name: 'SetScore',
               onMessageReceived: (JavascriptMessage message) {
                 var highscore = int.parse(message.message);
-                if (highscore > widget.game.highscore){
+                if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
                   db.updateGame(widget.game);
                 }

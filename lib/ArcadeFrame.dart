@@ -36,9 +36,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  List<Game> savedGames = [];
+  final searchController = TextEditingController();
+  final DBProvider db = DBProvider.db;
   String gamesLabel = "Popular Games";
-  DBProvider db = DBProvider.db;
+  List<Game> savedGames = [];
 
   @override
   void initState() {
@@ -50,11 +51,24 @@ class HomeScreenState extends State<HomeScreen> {
       });
     });
     */
-    getDefaultGames().then((result) {
+    _loadGames(API_SOME);
+    searchController.addListener(_searchGames);
+  }
+
+  _loadGames(String url) async {
+    getGames(url).then((result) {
       setState(() {
         savedGames = result;
       });
     });
+  }
+
+  _search() async {
+    if (searchController.text == "") {
+      _loadGames(API_SOME);
+      return;
+    }
+    _loadGames("${API_SEARCH}=${searchController.text}");
   }
 
   // TODO: Also update api that game was played.
@@ -68,8 +82,8 @@ class HomeScreenState extends State<HomeScreen> {
     return db.newGame(game);
   }
 
-  Future getDefaultGames() async {
-    return http.get(Uri.encodeFull(API_SOME),
+  Future getGames(String url) async {
+    return http.get(Uri.encodeFull(url),
         headers: {"Accept": "application/json"}).then((response) {
       var body = json.decode(response.body);
       List<Game> games =
@@ -84,7 +98,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final gameCodeInputController = new TextEditingController();
     final Orientation orientation = MediaQuery.of(context).orientation;
     final bool isLandscape = orientation == Orientation.landscape;
 
@@ -92,6 +105,16 @@ class HomeScreenState extends State<HomeScreen> {
       return Scaffold(body: Container(color: Color(0xFF73000a)));
     }
 
+    @override
+    void dispose() {
+      // Clean up the controller when the widget is removed from the
+      // widget tree.
+      searchController.dispose();
+      super.dispose();
+    }
+
+    // TODO: We can probably make this prettier :)
+    // Good job so far though.
     return Scaffold(
         body: Container(
             color: Color(0xFF73000a),
@@ -153,7 +176,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
                               hintStyle: const TextStyle(color: Colors.white)),
-                          controller: gameCodeInputController)),
+                          controller: searchController)),
                   Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                   new Text(gamesLabel,
                       style: TextStyle(
