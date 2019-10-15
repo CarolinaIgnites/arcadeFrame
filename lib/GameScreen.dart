@@ -1,3 +1,4 @@
+// TODO: Clean up sources. I just copy pasted.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,9 @@ class GameScreenState extends State<GameScreen> {
               }),
           JavascriptChannel(
               name: 'GetScore',
+              // TODO: There's a bug where __highscore gets out of sync of
+              // game.highscore, and produces glitchy looking results. Could
+              // fix on gameframe side. 'await' does not fix race condition.
               onMessageReceived: (JavascriptMessage message) async {
                 await _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");

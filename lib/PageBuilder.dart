@@ -1,3 +1,4 @@
+// TODO: Fix the sources potentially. Just copy pasted.
 import 'dart:io';
 import "dart:math";
 import 'package:flutter/services.dart';
@@ -34,6 +35,7 @@ class PageBuilder {
       return _assets[css];
     }
     return rootBundle.loadString(css).then((source) {
+      // Not sure if replacing \n is needed. Particular api used is finiky.
       _assets[css] =
           _css_template.renderString({"css": source.replaceAll("\n", "")});
       return _assets[css];
@@ -50,17 +52,15 @@ class PageBuilder {
     });
   }
 
-  //function to get the data field of the gameframe game
+  // Check if we already have the data, otherwise load it.
   Future<String> _queryGame(Game game) async {
     if (game.json != null) {
       return game.json;
     }
     final DBProvider db = DBProvider.db;
     String key = game.hash.substring(KEY_OFFSET);
-    return http.get(Uri.encodeFull("${API_ENDPOINT}/${key}"), headers: {
-      //if your api require key then pass your key here as well e.g "key": "my-long-key"
-      "Accept": "application/json"
-    }).then((response) {
+    return http.get(Uri.encodeFull("${API_ENDPOINT}/${key}"),
+        headers: {"Accept": "application/json"}).then((response) {
       var body = json.decode(response.body);
       String data = utf8.decode(base64.decode(body["data"]));
       game.json = data;
@@ -79,6 +79,7 @@ class PageBuilder {
     return _template;
   }
 
+  // Probably a cleaner way to do this.
   Future<void> _load_batch(List<String> csses, List<String> jses, controller) {
     var futures = <Future>[];
     for (var css in csses) {
@@ -97,11 +98,13 @@ class PageBuilder {
     // URI. There is a way to render a local HTML file in flutter, but the pull
     // request has not come through yet (see
     // https://github.com/flutter/plugins/pull/1247)
+    // As hacky as this is, it does work.
     List<String> csses;
     List<String> jses;
-    for (int i = 0;
-        i < max(CSS_ASSETS_BY_PRIORITY.length, JS_ASSETS_BY_PRIORITY.length);
-        i++) {
+    // Def a cleaner way to do this.
+    final int loads =
+        max(CSS_ASSETS_BY_PRIORITY.length, JS_ASSETS_BY_PRIORITY.length);
+    for (int i = 0; i < loads; i++) {
       csses = [];
       jses = [];
       if (i < CSS_ASSETS_BY_PRIORITY.length) {
@@ -110,6 +113,8 @@ class PageBuilder {
       if (i < JS_ASSETS_BY_PRIORITY.length) {
         jses = JS_ASSETS_BY_PRIORITY[i];
       }
+      // Block to load all assets of this level.
+      // Note there is a bug where bootstrap doesn't load. Hmm :/
       await _load_batch(csses, jses, controller);
     }
 
@@ -121,6 +126,7 @@ class PageBuilder {
     });
   }
 
+  // What a hack.
   Future<String> getPage() async {
     if (_page == null) {
       return rootBundle.loadString(GAME_ASSET).then((page) {

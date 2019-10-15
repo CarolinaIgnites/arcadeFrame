@@ -5,6 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'Game.dart';
 
+// I just followed some medium article honestly:
+// https://medium.com/flutter-community/using-sqlite-in-flutter-187c1a82e8b
 class DBProvider {
   DBProvider._();
   static final DBProvider db = DBProvider._();

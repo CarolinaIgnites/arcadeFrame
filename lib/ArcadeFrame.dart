@@ -1,3 +1,4 @@
+// TODO: Clean up sources. I just copy pasted.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -44,13 +45,8 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     db.initDB();
-    /* TODO: Once we set up a favourite button
-    getFavouriteGames().then((result) {
-      setState(() {
-        favedGames = result;
-      });
-    });
-    */
+    // TODO: Once we set up a favourite button
+    // Something like getFavouriteGames()
     _loadGames(API_SOME);
     searchController.addListener(_searchGames);
   }
@@ -63,7 +59,9 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  _search() async {
+  // Redisearch also provides something called suggestion completion. Something
+  // we could do, but our 0.5GB RAM VM, is struggling as is.
+  _searchGames() async {
     if (searchController.text == "") {
       _loadGames(API_SOME);
       return;
