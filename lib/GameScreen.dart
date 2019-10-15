@@ -77,7 +77,7 @@ class GameScreenState extends State<GameScreen> {
               }),
           JavascriptChannel(
               name: 'GetScore',
-              onMessageReceived: (JavascriptMessage message) {
+              onMessageReceived: (JavascriptMessage message) async {
                 await _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");
                 return widget.game.highscore;
