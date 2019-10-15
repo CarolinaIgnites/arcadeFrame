@@ -69,13 +69,16 @@ class GameScreenState extends State<GameScreen> {
           JavascriptChannel(
               name: 'SetScore',
               onMessageReceived: (JavascriptMessage message) {
-                widget.game.highscore = int.parse(message.message);
-                db.updateGame(widget.game);
+                var highscore = int.parse(message.message);
+                if (highscore > widget.game.highscore){
+                  widget.game.highscore = highscore;
+                  db.updateGame(widget.game);
+                }
               }),
           JavascriptChannel(
               name: 'GetScore',
               onMessageReceived: (JavascriptMessage message) {
-                _controller.evaluateJavascript(
+                await _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");
                 return widget.game.highscore;
               })
