@@ -1,4 +1,4 @@
-package com.example.carolinaignites;
+package org.carolinaignites.app;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
