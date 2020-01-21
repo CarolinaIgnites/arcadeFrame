@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "354786876028",
+    "firebase_url": "https://carolina-ignites.firebaseio.com",
+    "project_id": "carolina-ignites",
+    "storage_bucket": "carolina-ignites.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354786876028:android:4e932e7c49889ef88307f9",
+        "android_client_info": {
+          "package_name": "org.carolinaignites.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354786876028-lghl4i58k76h2r9chf17ub6m9nipa04o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5Mt7445BPKGaSKYtbrGu7G0Ejy62vuv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354786876028-lghl4i58k76h2r9chf17ub6m9nipa04o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "354786876028-1boh7levmfiri63e945ddk6s9qqm157l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.carolinaignites.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

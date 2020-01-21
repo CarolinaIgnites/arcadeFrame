@@ -28,9 +28,9 @@
     debug : false,
     name : `{{meta.name}}`,
     instructions : `{{meta.instructions}}`,
-    boundaries : `{{meta.boundaries}}`,
-    impulse : `{{meta.impulse}}`,
-    gravity : `{{meta.gravity}}`,
+    boundaries : {{meta.boundaries}},
+    impulse : {{meta.impulse}},
+    gravity : {{meta.gravity}},
     external_cache : function(key, value) {
       // Possibly leverage the app to store extra information
     },

@@ -1,28 +1,19 @@
-// TODO: Fix the sources potentially. Just copy pasted.
-import 'dart:io';
 import "dart:math";
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:async/async.dart';
 import 'dart:convert';
-import 'package:flutter/scheduler.dart';
 
-import 'package:http/http.dart' as http;
-
+import 'package:flutter/foundation.dart';
 import 'package:reflected_mustache/mustache.dart';
 import 'Constants.dart';
-import 'Database.dart';
 import 'Game.dart';
+import 'GameBLoC.dart';
 
 class PageBuilder {
   static final PageBuilder _singleton = new PageBuilder._internal();
 
   PageBuilder._internal();
   String _page;
-  Template _css_template = new Template(CSS_TEMPLATE);
+  Template _cssTemplate = new Template(CSS_TEMPLATE);
   Template _template;
   Map<String, String> _assets = {};
 
@@ -37,7 +28,7 @@ class PageBuilder {
     return rootBundle.loadString(css).then((source) {
       // Not sure if replacing \n is needed. Particular api used is finiky.
       _assets[css] =
-          _css_template.renderString({"css": source.replaceAll("\n", "")});
+          _cssTemplate.renderString({"css": source.replaceAll("\n", "")});
       return _assets[css];
     });
   }
@@ -53,20 +44,13 @@ class PageBuilder {
   }
 
   // Check if we already have the data, otherwise load it.
-  Future<String> _queryGame(Game game) async {
+  Future<String> _queryGame(Game game, GameBLoC bloc) async {
+    debugPrint(game.json);
     if (game.json != null) {
       return game.json;
     }
-    final DBProvider db = DBProvider.db;
-    String key = game.hash.substring(KEY_OFFSET);
-    return http.get(Uri.encodeFull("${API_ENDPOINT}/${key}"),
-        headers: {"Accept": "application/json"}).then((response) {
-      var body = json.decode(response.body);
-      String data = utf8.decode(base64.decode(body["data"]));
-      game.json = data;
-      db.updateGame(game);
-      return data;
-    });
+    game = await bloc.queryGame(game.hash);
+    return game.json;
   }
 
   Future<Template> _loadTemplate() async {
@@ -80,7 +64,7 @@ class PageBuilder {
   }
 
   // Probably a cleaner way to do this.
-  Future<void> _load_batch(List<String> csses, List<String> jses, controller) {
+  Future<void> _loadBatch(List<String> csses, List<String> jses, controller) {
     var futures = <Future>[];
     for (var css in csses) {
       futures.add(_loadCss(css)
@@ -93,7 +77,7 @@ class PageBuilder {
     return Future.wait(futures);
   }
 
-  Future loadSources(Game game, controller) async {
+  Future loadSources(Game game, controller, GameBLoC bloc) async {
     // We have to load sources manually, because we cannot load sources from a
     // URI. There is a way to render a local HTML file in flutter, but the pull
     // request has not come through yet (see
@@ -115,12 +99,12 @@ class PageBuilder {
       }
       // Block to load all assets of this level.
       // Note there is a bug where bootstrap doesn't load. Hmm :/
-      await _load_batch(csses, jses, controller);
+      await _loadBatch(csses, jses, controller);
     }
 
     // Now we load the game.
     _loadTemplate().then((template) {
-      return _queryGame(game).then((data) {
+      return _queryGame(game, bloc).then((data) {
         controller.evaluateJavascript(template.renderString(json.decode(data)));
       });
     });
