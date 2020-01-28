@@ -65,9 +65,10 @@ class GameBLoC {
         .listen(fn);
   }
 
-  requestGameUpdate(Game game) {
+  Future<Game> requestGameUpdate(Game game) async {
     games[game.hash] = game;
     _interactStreamController.add(game);
+    return game;
   }
 
   Game getCurrentGame(Game game) {

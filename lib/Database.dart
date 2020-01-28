@@ -39,7 +39,7 @@ class DBProvider {
 
   Future<Game> newGame(Game game) async {
     final db = await database;
-    await db.rawInsert(
+    var raw = await db.rawInsert(
         "INSERT Into Games "
         "(hash, name, description, json, highscore, plays, favourited, saved)"
         " VALUES (?,?,?,?,?,?,?,?)",
@@ -58,7 +58,7 @@ class DBProvider {
 
   Future<Game> updateGame(Game game) async {
     final db = await database;
-    await db.update("Games", game.toMap(),
+    var res = await db.update("Games", game.toMap(),
         where: "hash = ?", whereArgs: [game.hash]);
     return game;
   }
