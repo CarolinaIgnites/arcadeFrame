@@ -1,206 +1,121 @@
-// TODO: Clean up sources. I just copy pasted.
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:async/async.dart';
-import 'dart:convert';
-import 'package:flutter/scheduler.dart';
-import 'package:auto_orientation/auto_orientation.dart';
 
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:http/http.dart' as http;
 import "Game.dart";
-import "GameScreen.dart";
-import "Constants.dart";
-import "Database.dart";
+import "GameBLoC.dart";
+import "Colors.dart";
 
-import 'dart:developer';
+import "components/Section.dart";
+import "components/Nav.dart";
+import "components/Header.dart";
+import "components/Drawer.dart";
+
+import 'package:uni_links/uni_links.dart';
+import 'package:flutter/services.dart' show PlatformException;
+
+import 'package:firebase_analytics/firebase_analytics.dart';
+
+final FirebaseAnalytics analytics = FirebaseAnalytics();
 
 class ArcadeFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        home: HomeScreen(),
+        home: _HomeScreen(),
         theme: ThemeData(fontFamily: 'Helvetica') //default font for entire app
         );
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class _HomeScreen extends StatefulWidget {
   @override
-  State createState() => new HomeScreenState();
+  State createState() => new _HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
-  final searchController = TextEditingController();
-  final DBProvider db = DBProvider.db;
-  String gamesLabel = "Popular Games";
-  List<Game> savedGames = [];
+class _HomeScreenState extends State<_HomeScreen> {
+  GameBLoC bloc;
+  double scroll = 0.0;
+  var refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
-    db.initDB();
-    // TODO: Once we set up a favourite button
-    // Something like getFavouriteGames()
-    _loadGames(API_SOME);
-    searchController.addListener(_searchGames);
+    super.initState();
+
+    bloc = GameBLoC();
+    initUniLinks();
   }
 
-  _loadGames(String url) async {
-    getGames(url).then((result) {
-      setState(() {
-        savedGames = result;
-      });
-    });
+  @override
+  void dispose() {
+    // Clean up the bloc when the widget is removed from the
+    // widget tree.
+    bloc.dispose();
+    super.dispose();
   }
 
-  // Redisearch also provides something called suggestion completion. Something
-  // we could do, but our 0.5GB RAM VM, is struggling as is.
-  _searchGames() async {
-    if (searchController.text == "") {
-      _loadGames(API_SOME);
-      return;
+  Future<Null> refreshList() async {
+    refreshKey.currentState?.show(atTop: false);
+    bloc.searchChannel.request();
+    bloc.favoriteChannel.request();
+    bloc.popularChannel.request();
+    await Future.delayed(Duration(seconds: 1));
+    return null;
+  }
+
+  Future<Null> initUniLinks() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      Uri uri = await getInitialUri();
+      await loadFromUri(uri);
+    } on PlatformException {
+      debugPrint("uri failed...");
     }
-    _loadGames("${API_SEARCH}=${searchController.text}");
+    getUriLinksStream().listen(loadFromUri);
   }
 
-  // TODO: Also update api that game was played.
-  // Potential race condition, becasue PageBuilder expects the game to be set.
-  // but I think to get to that point is pretty slow, so we should be good.
-  Future saveGame(Game game) async {
-    game.plays += 1;
-    if (game.saved) {
-      return db.updateGame(game);
-    }
-    return db.newGame(game);
-  }
+  loadFromUri(Uri uri) async {
+    if (uri == null) return;
+    var segs = uri.pathSegments;
+    if (segs.length != 2 && segs[0] != "app") return;
 
-  Future getGames(String url) async {
-    return http.get(Uri.encodeFull(url),
-        headers: {"Accept": "application/json"}).then((response) {
-      var body = json.decode(response.body);
-      List<Game> games =
-          body["results"].map<Game>((json) => Game.fromMap(json)).toList();
-      return db.backfillGames(games);
-    });
-  }
+    Game game = await bloc.queryGame(segs[1]);
+    if (game == null) return;
 
-  Future getFavouriteGames() async {
-    // TODO: Extract favorite games for display
+    bloc.viewGame(game, context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final Orientation orientation = MediaQuery.of(context).orientation;
-    final bool isLandscape = orientation == Orientation.landscape;
-
-    if (isLandscape) {
-      return Scaffold(body: Container(color: Color(0xFF73000a)));
-    }
-
-    @override
-    void dispose() {
-      // Clean up the controller when the widget is removed from the
-      // widget tree.
-      searchController.dispose();
-      super.dispose();
-    }
-
-    // TODO: We can probably make this prettier :)
-    // Good job so far though.
-    return Scaffold(
-        body: Container(
-            color: Color(0xFF73000a),
-            child: Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.width * 0.1),
-                child: Column(children: [
-                  Padding(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Row(children: [
-                        Column(children: [
-                          Row(children: <Widget>[
-                            new Text('Arcade ',
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.075,
-                                    fontFamily: "arcadeclassic",
-                                    color: Colors.white)),
-                            new Text('Frame',
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                    fontFamily: "arcadeclassic",
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold))
-                          ]),
-                        ]),
-                        Column(children: [
-                          Padding(
-                              padding: EdgeInsets.only(bottom: 0),
-                              child: IconButton(
-                                iconSize:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                icon:
-                                    new Image.asset("assets/icons/gamepad.png"),
-                              ))
-                        ])
-                      ])),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextField(
-                          style: TextStyle(color: Colors.white),
-                          decoration: new InputDecoration(
-                              enabledBorder: new OutlineInputBorder(
-                                  borderSide: new BorderSide(
-                                      color: Colors.white, width: 2.0)),
-                              focusedBorder: new OutlineInputBorder(
-                                  borderSide: new BorderSide(
-                                      color: Colors.white, width: 2.0)),
-                              hintText: 'Keywords in the title',
-                              labelText: 'Search for a game',
-                              prefixIcon: const Icon(
-                                Icons.code,
-                                color: Colors.white,
-                              ),
-                              labelStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                              hintStyle: const TextStyle(color: Colors.white)),
-                          controller: searchController)),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                  new Text(gamesLabel,
-                      style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width * 0.05,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
-                  new ListView.builder(
-                      padding: EdgeInsets.all(0.0),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: savedGames.length,
-                      itemBuilder: (BuildContext ctxt, int index) {
-                        return new RaisedButton(
-                          color: Colors.white,
-                          child: Text(savedGames[index].name),
-                          onPressed: () {
-                            saveGame(savedGames[index]);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GameScreen(
-                                          game: savedGames[index],
-                                        )));
-                          },
-                        );
-                      }),
-                ]))));
+    // TODO: Use media queries to make more responsive.
+    // final Orientation orientation = MediaQuery.of(context).orientation;
+    // final bool isLandscape = orientation == Orientation.landscape;
+    return new Scaffold(
+        appBar: new IgniteNav(bloc: bloc),
+        drawer: new IgniteDrawer(),
+        backgroundColor: BACKGROUND_COLOR,
+        body: RefreshIndicator(
+          key: refreshKey,
+          child: new NotificationListener(
+              onNotification: (event) {
+                if (event is ScrollUpdateNotification)
+                  setState(() => scroll -= event.scrollDelta / 2);
+                return false;
+              },
+              child: new Stack(children: <Widget>[
+                new IgniteHeader(scroll: scroll),
+                CustomScrollView(slivers: <Widget>[
+                  new SliverPadding(
+                      padding: EdgeInsets.only(top: 64),
+                      sliver: new IgniteSection(
+                          title: "Favorites", channel: bloc.favoriteChannel)),
+                  new IgniteSection(
+                      title: "Popular Games", channel: bloc.popularChannel),
+                  new IgniteSection(
+                      title: "Search Results",
+                      channel: bloc.searchChannel,
+                      visible: false),
+                ])
+              ])),
+          onRefresh: refreshList,
+        ));
   }
 }

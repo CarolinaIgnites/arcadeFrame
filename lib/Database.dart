@@ -37,7 +37,7 @@ class DBProvider {
     });
   }
 
-  newGame(Game game) async {
+  Future<Game> newGame(Game game) async {
     final db = await database;
     var raw = await db.rawInsert(
         "INSERT Into Games "
@@ -53,25 +53,25 @@ class DBProvider {
           game.favourited,
           1,
         ]);
-    return raw;
+    return game;
   }
 
-  updateGame(Game game) async {
+  Future<Game> updateGame(Game game) async {
     final db = await database;
     var res = await db.update("Games", game.toMap(),
         where: "hash = ?", whereArgs: [game.hash]);
-    return res;
+    return game;
   }
 
   Future<List<Game>> backfillGames(List<Game> games) async {
     List<String> hashes = games.map<String>((g) => g.hash).toList();
     String qs = (new List.filled(hashes.length, "?").join(", "));
     return database.then((db) {
-      return db.query("Games", where: "hash in (${qs})", whereArgs: hashes);
+      return db.query("Games", where: "hash in ($qs)", whereArgs: hashes);
     }).then((rows) {
       var saved = rows.map<Game>((row) => Game.fromRow(row));
-      var saved_hashes = Set<String>.from(saved.map<String>((g) => g.hash));
-      var unsaved = games.where((g) => !saved_hashes.contains(g.hash)).toList();
+      var savedHashes = Set<String>.from(saved.map<String>((g) => g.hash));
+      var unsaved = games.where((g) => !savedHashes.contains(g.hash)).toList();
       return [...saved, ...unsaved];
     });
   }
@@ -82,9 +82,10 @@ class DBProvider {
     return res.isNotEmpty ? Game.fromRow(res.first) : null;
   }
 
-  Future<List<Game>> getFavGames() async {
+  Future<List<Game>> getFavoriteGames([int offset = 0]) async {
     final db = await database;
-    var res = await db.query("Game", where: "favourite = ? ", whereArgs: [1]);
+    // TODO: Offset?
+    var res = await db.query("Games", where: "favourited = ? ", whereArgs: [1]);
     List<Game> list =
         res.isNotEmpty ? res.map((c) => Game.fromRow(c)).toList() : [];
     return list;

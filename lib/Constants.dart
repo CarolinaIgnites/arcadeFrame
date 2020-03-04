@@ -1,6 +1,6 @@
 const String API_ENDPOINT = "https://api.carolinaignites.org";
-const String API_SEARCH = "${API_ENDPOINT}/search?search=";
-const String API_SOME = "${API_ENDPOINT}/some";
+const String API_SEARCH = "$API_ENDPOINT/search?search=";
+const String API_SOME = "$API_ENDPOINT/some";
 const String GAME_ASSET = "assets/game/game.html";
 ///////////////////////////////////
 //     J                      S
@@ -14,6 +14,8 @@ const String GAME_ASSET = "assets/game/game.html";
 const String JS_MUSTACHE = "assets/the.stache.js";
 //published games have the prefix "published_"
 const int KEY_OFFSET = 10;
+const int KEY_SIZE = 16;
+
 // @media screen is needed, because only 1 rule at a time can be added to a
 // style sheet. However, this way, bulk rules can be added.
 const String CSS_TEMPLATE = """{

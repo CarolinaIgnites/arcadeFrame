@@ -29,11 +29,16 @@ dependencies:
   sqflite: any
   reflected_mustache: ^1.0.11
   webview_flutter: ^0.3.7
-
+  # Add the dependency for the Firebase Core Flutter SDK
+  firebase_core: ^0.4.0+9
+    # Add the dependency for the FlutterFire plugin for Google Analytics
+  firebase_analytics: ^5.0.6
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  flare_flutter:
+  uni_links:
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +74,9 @@ flutter:
 
   assets:
     - assets/icons/gamepad.png
+    - assets/icons/heart.flr
+    - assets/card.png
+    - assets/colors.png
     - assets/the.stache.js
     - assets/game/game.html
     - assets/game/css/bootstrap.min.css

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:core';
 
 class Game {
@@ -27,6 +26,7 @@ class Game {
         hash: json["id"],
         name: json["title"],
         description: json["instructions"],
+        json: json["json"],
         highscore: 0,
         plays: 0,
         favourited: false,
@@ -37,6 +37,7 @@ class Game {
         hash: json["hash"],
         name: json["name"],
         description: json["description"],
+        json: json["json"],
         highscore: json["highscore"],
         plays: json["plays"],
         favourited: json["favourited"] == 1,

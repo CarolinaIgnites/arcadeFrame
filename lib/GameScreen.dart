@@ -1,47 +1,40 @@
-// TODO: Clean up sources. I just copy pasted.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:async/async.dart';
-import 'dart:convert';
-import 'package:flutter/scheduler.dart';
 import 'package:auto_orientation/auto_orientation.dart';
 
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:http/http.dart' as http;
 import "Game.dart";
+import "GameBLoC.dart";
 import "PageBuilder.dart";
-import "Constants.dart";
-import "Database.dart";
 
 class GameScreen extends StatefulWidget {
   final Game game;
+  final GameBLoC bloc;
 
   @override
   State createState() => new GameScreenState();
 
   //constructor
-  GameScreen({Key key, @required this.game}) : super(key: key);
+  GameScreen({Key key, @required this.game, this.bloc}) : super(key: key);
 }
 
 class GameScreenState extends State<GameScreen> {
   final flutterWebViewPlugin = FlutterWebviewPlugin();
   final PageBuilder builder = PageBuilder();
-  final DBProvider db = DBProvider.db;
+  GameBLoC bloc;
 
   // To prevent double execution of code.
-  bool is_active = false;
+  bool isActive = false;
 
   Future<void> _loadSources(String _unused) {
-    if (!is_active) {
-      is_active = true;
-      builder.loadSources(widget.game, _controller);
+    if (!isActive) {
+      isActive = true;
+      return builder.loadSources(widget.game, _controller, bloc);
     }
+    return null;
   }
 
   WebViewController _controller;
@@ -54,6 +47,7 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeLeft,
     ]);
     AutoOrientation.landscapeRightMode();
+    bloc = widget.bloc;
   }
 
   @override
@@ -73,7 +67,8 @@ class GameScreenState extends State<GameScreen> {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
-                  db.updateGame(widget.game);
+                  debugPrint("the json ${widget.game.json}");
+                  bloc.saveGame(widget.game);
                 }
               }),
           JavascriptChannel(
@@ -99,7 +94,7 @@ class GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     super.dispose();
-    is_active = false;
+    isActive = false;
     flutterWebViewPlugin.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
