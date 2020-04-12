@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart' as wv;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:auto_orientation/auto_orientation.dart';
@@ -37,7 +37,7 @@ class GameScreenState extends State<GameScreen> {
     return null;
   }
 
-  WebViewController _controller;
+  wv.WebViewController _controller;
   @override
   void initState() {
     //get JS from webpacket
@@ -52,18 +52,18 @@ class GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return new WebView(
+    return new wv.WebView(
         initialUrl: "",
-        javascriptMode: JavascriptMode.unrestricted,
+        javascriptMode: wv.JavascriptMode.unrestricted,
         gestureRecognizers: Set()
           ..add(Factory<VerticalDragGestureRecognizer>(
               () => VerticalDragGestureRecognizer()))
           ..add(Factory<HorizontalDragGestureRecognizer>(
               () => HorizontalDragGestureRecognizer())),
         javascriptChannels: Set.from([
-          JavascriptChannel(
+          wv.JavascriptChannel(
               name: 'SetScore',
-              onMessageReceived: (JavascriptMessage message) {
+              onMessageReceived: (wv.JavascriptMessage message) {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
@@ -71,18 +71,22 @@ class GameScreenState extends State<GameScreen> {
                   bloc.saveGame(widget.game);
                 }
               }),
-          JavascriptChannel(
+          wv.JavascriptChannel(
               name: 'GetScore',
-              // TODO: There's a bug where __highscore gets out of sync of
-              // game.highscore, and produces glitchy looking results. Could
-              // fix on gameframe side. 'await' does not fix race condition.
-              onMessageReceived: (JavascriptMessage message) async {
+              onMessageReceived: (wv.JavascriptMessage message) async {
                 await _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");
                 return widget.game.highscore;
+              }),
+          wv.JavascriptChannel(
+              name: 'GameOver',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                widget.game.plays += 1;
+                debugPrint("plays ${widget.game.plays}");
+                bloc.saveGame(widget.game);
               })
         ]),
-        onWebViewCreated: (WebViewController c) {
+        onWebViewCreated: (wv.WebViewController c) {
           _controller = c;
           builder.getPage().then((String page) {
             _controller.loadUrl(page);

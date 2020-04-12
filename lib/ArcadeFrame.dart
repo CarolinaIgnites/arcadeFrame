@@ -106,13 +106,17 @@ class _HomeScreenState extends State<_HomeScreen> {
                   new SliverPadding(
                       padding: EdgeInsets.only(top: 64),
                       sliver: new IgniteSection(
-                          title: "Favorites", channel: bloc.favoriteChannel)),
+                          title: "Favorites",
+                          channel: bloc.favoriteChannel,
+                          hideable: true)),
                   new IgniteSection(
-                      title: "Popular Games", channel: bloc.popularChannel),
+                      title: "Popular Games", channel: bloc.popularChannel,
+                      missing_message: ":( \n offline..."),
                   new IgniteSection(
                       title: "Search Results",
                       channel: bloc.searchChannel,
-                      visible: false),
+                      visible: false,
+                      missing_message: ":( \n no \n results"),
                 ])
               ])),
           onRefresh: refreshList,

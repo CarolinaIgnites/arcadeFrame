@@ -47,6 +47,7 @@
     },
     set_score: function(score){SetScore.postMessage(score); window.__highscore = score;},
     get_score: function(){GetScore.postMessage(0); return window.__highscore | 0;},
+    gameover_hook: function(){GameOver.postMessage();},
   };
 
   let container = document.querySelector("#container");

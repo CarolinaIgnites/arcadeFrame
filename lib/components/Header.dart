@@ -41,10 +41,9 @@ class _IgniteHeaderState extends State<IgniteHeader> {
                   Padding(
                       padding: EdgeInsets.only(bottom: 0),
                       child: IconButton(
-                        iconSize: MediaQuery.of(context).size.width * 0.1,
-                        icon: new Image.asset("assets/icons/gamepad.png"),
-                        onPressed: (){}
-                      ))
+                          iconSize: MediaQuery.of(context).size.width * 0.1,
+                          icon: new Image.asset("assets/icons/gamepad.png"),
+                          onPressed: () {}))
                 ])
               ]))),
     ]);

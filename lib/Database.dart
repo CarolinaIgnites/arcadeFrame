@@ -39,26 +39,31 @@ class DBProvider {
 
   Future<Game> newGame(Game game) async {
     final db = await database;
-    var raw = await db.rawInsert(
-        "INSERT Into Games "
-        "(hash, name, description, json, highscore, plays, favourited, saved)"
-        " VALUES (?,?,?,?,?,?,?,?)",
-        [
-          game.hash,
-          game.name,
-          game.description,
-          game.json,
-          0,
-          game.plays,
-          game.favourited,
-          1,
-        ]);
+    try {
+      await db.rawInsert(
+          "INSERT Into Games "
+          "(hash, name, description, json, highscore, plays, favourited, saved)"
+          " VALUES (?,?,?,?,?,?,?,?)",
+          [
+            game.hash,
+            game.name,
+            game.description,
+            game.json,
+            0,
+            game.plays,
+            game.favourited,
+            1,
+          ]);
+    } on DatabaseException {
+      game.saved = true;
+      return updateGame(game);
+    }
     return game;
   }
 
   Future<Game> updateGame(Game game) async {
     final db = await database;
-    var res = await db.update("Games", game.toMap(),
+    await db.update("Games", game.toMap(),
         where: "hash = ?", whereArgs: [game.hash]);
     return game;
   }

@@ -9,12 +9,16 @@ class IgniteSection extends StatefulWidget {
       {Key key,
       @required this.title,
       @required this.channel,
-      this.visible = true})
+      this.hideable = false,
+      this.visible = true,
+      this.missing_message = ":("})
       : super(key: key);
 
   final String title;
   final GameChannel channel;
+  final bool hideable;
   final bool visible;
+  final String missing_message;
 
   @override
   State createState() => new _IgniteSectionState();
@@ -22,12 +26,16 @@ class IgniteSection extends StatefulWidget {
 
 class _IgniteSectionState extends State<IgniteSection> {
   bool visible;
+  bool hideable;
   bool prev = false;
+  String missing_message = ":(";
 
   @override
   void initState() {
     super.initState();
     visible = widget.visible;
+    hideable = widget.hideable;
+    missing_message = widget.missing_message;
     widget.channel.request();
     widget.channel.visibilityListener = (bool result) => setState(() {
           visible = result;
@@ -36,13 +44,15 @@ class _IgniteSectionState extends State<IgniteSection> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Provide header and load more option.
+    // TODO: Provide Load more option, or infinite scroll.
     return StreamBuilder(
         stream: widget.channel.stream,
         builder: (context, AsyncSnapshot<List<Game>> snapshot) {
           return new SliverList(delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-              if (snapshot.data == null || !visible) {
+              bool is_empty =
+                  (snapshot.data == null || snapshot.data.length == 0);
+              if (!visible || (is_empty && hideable)) {
                 return null;
               }
 
@@ -55,11 +65,23 @@ class _IgniteSectionState extends State<IgniteSection> {
                             fontFamily: "arcadeclassic",
                             color: ARCADE_COLOR)));
               }
-              index -= 1;
 
-              if (index >= snapshot.data.length) return null;
+              if ((is_empty && index >= 2) ||
+                  (!is_empty && index > snapshot.data.length)) {
+                return null;
+              } else if (is_empty) {
+                return Center(
+                    heightFactor: 3,
+                    child: new Text(missing_message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.05,
+                            fontFamily: "arcadeclassic",
+                            color: ARCADE_COLOR)));
+              }
+
               return new IgniteCard(
-                  snapshot.data[index], widget.channel.context);
+                  snapshot.data[index - 1], widget.channel.context);
             },
           ));
         });
