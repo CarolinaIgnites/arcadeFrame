@@ -12,9 +12,9 @@ const String GAME_ASSET = "assets/game/game.html";
 // ████████████▀░░░░░▀█████████████
 // ░▀▀▀▀▀▀▀▀▀░░░░░░░░░░░▀▀▀▀▀▀▀▀▀░░
 const String JS_MUSTACHE = "assets/the.stache.js";
-//published games have the prefix "published_"
-const int KEY_OFFSET = 10;
-const int KEY_SIZE = 16;
+// published games have the prefix "published_"
+const String PUBLISHED = "published_";
+const int KEY_OFFSET = PUBLISHED.length; // = 10
 
 // @media screen is needed, because only 1 rule at a time can be added to a
 // style sheet. However, this way, bulk rules can be added.

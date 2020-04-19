@@ -83,7 +83,7 @@ class GameBLoC {
     debugPrint("length ${hash.length} $hash");
     debugPrint("${hash.substring(0, KEY_OFFSET)}");
     String key = hash;
-    if (key.substring(0, KEY_OFFSET) == "published_") {
+    if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
     }
     return http.get(Uri.encodeFull("$API_ENDPOINT/$key"),
