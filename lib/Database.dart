@@ -40,7 +40,7 @@ class DBProvider {
       // dev cost, and only a 1 time fix anyway.
       if (oldVersion < 2 && newVersion >= 2) {
         await db.execute(imageTableV2());
-        Future.wait(gameTableV2Delta().map<Future>((q)=>db.execute(q)));
+        Future.wait(gameTableV2Delta().map<Future>((q) => db.execute(q)));
       }
     }, onCreate: (Database db, int version) async {
       // These should always be the most up to data table versions.

@@ -48,3 +48,8 @@ const List<List<String>> CSS_ASSETS_BY_PRIORITY = [
   ["assets/game/css/minimal.css"],
   ["assets/game/css/gameframe.css"],
 ];
+
+// Information pages in Nav Drawer
+const String ABOUT_PAGE = "assets/pages/about.md";
+const String LICENSE_PAGE = "assets/pages/license.md";
+const String PRIVACY_PAGE = "assets/pages/privacy.md";

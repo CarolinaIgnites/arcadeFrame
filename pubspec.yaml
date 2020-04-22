@@ -19,25 +19,29 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Builtin
   async:
-  auto_orientation: ^1.0.1
-  flutter_webview_plugin: 0.3.10+1
   http:
-  material_design_icons_flutter: 3.2.3695
-  native_device_orientation: ^0.2.0
   path_provider:
-  sqflite: any
-  reflected_mustache: ^1.0.11
+  # probably clean up one of these
+  auto_orientation: ^1.0.1
+  native_device_orientation: ^0.2.0
+  # Webview
+  flutter_webview_plugin: 0.3.10+1
   webview_flutter: ^0.3.7
-  # Add the dependency for the Firebase Core Flutter SDK
+  #DB
+  sqflite: any
+  # File processing
+  reflected_mustache: ^1.0.11
+  flutter_markdown: ^0.3.5
+  # Analytics
   firebase_core: ^0.4.0+9
-  # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^5.0.6
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # UI
   cupertino_icons: ^0.1.2
+  material_design_icons_flutter: 3.2.3695
   flare_flutter:
+  # QR code
   uni_links:
 
 dev_dependencies:
@@ -87,6 +91,9 @@ flutter:
     - assets/game/js/jquery.min.js
     - assets/game/js/nipplejs.js
     - assets/game/js/physicsjs-full.min.js
+    - assets/pages/about.md
+    - assets/pages/privacy.md
+    - assets/pages/license.md
 
   fonts:
     - family: arcadeclassic

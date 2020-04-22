@@ -49,7 +49,6 @@ class _IgniteCardState extends State<IgniteCard> {
 
   _refresh(game) {
     _game = widget.bloc.getCurrentGame(game);
-    // paused = widget.game.favourited == _game.favourited;
     widget.game.favourited = _game.favourited;
     if (subscription != null) subscription.cancel();
     subscription = widget.bloc.registerGameListener(_game, update);
@@ -95,12 +94,12 @@ class _IgniteCardState extends State<IgniteCard> {
                       FlatButton(
                         child: Text("HIGHSCORE: ${textify(_game.highscore)}",
                             style: TextStyle(fontFamily: "arcadeclassic")),
-                        onPressed: () {/* ... */},
+                        onPressed: () {/* TODO: Maybe show highset score. */},
                       ),
                       FlatButton(
                         child: Text("PLAYS: ${textify(_game.plays)}",
                             style: TextStyle(fontFamily: "arcadeclassic")),
-                        onPressed: () {/* ... */},
+                        onPressed: () {/* // TODO: Maybe show total plays */},
                       ),
                       // TODO: Break out into own component.
                       // new Like(_game, widget.bloc),

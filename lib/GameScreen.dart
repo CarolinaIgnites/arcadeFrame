@@ -38,8 +38,7 @@ class GameScreenState extends State<GameScreen> {
   }
 
   Future<void> dispatchEvent(String key, String data) {
-    return _controller.evaluateJavascript(
-        "(function(){"
+    return _controller.evaluateJavascript("(function(){"
         "let event = new CustomEvent(`${key}`, {detail: { data: `${data}` }});"
         "window.dispatchEvent(event);"
         "})();");

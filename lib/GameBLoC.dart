@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import "Game.dart";
@@ -86,17 +87,21 @@ class GameBLoC {
     if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
     }
-    return http.get(Uri.encodeFull("$API_ENDPOINT/$key"),
-        headers: {"Accept": "application/json"}).then((response) {
-      if (response.statusCode != 200) return null;
-      var body = json.decode(response.body);
-      String data = utf8.decode(base64.decode(body["data"]));
-      Game game = Game.fromMap(body);
-      game.json = data;
-      debugPrint("$data");
-      db.updateGame(game);
-      return game;
-    });
+    try {
+      return http.get(Uri.encodeFull("$API_ENDPOINT/$key"),
+          headers: {"Accept": "application/json"}).then((response) {
+        if (response.statusCode != 200) return null;
+        var body = json.decode(response.body);
+        String data = utf8.decode(base64.decode(body["data"]));
+        Game game = Game.fromMap(body);
+        game.json = data;
+        debugPrint("$data");
+        db.updateGame(game);
+        return game;
+      });
+    } on SocketException {
+      return null;
+    }
   }
 
   Future<bool> _getSearch() {
@@ -158,14 +163,19 @@ class GameBLoC {
 
   Future<List<Game>> getGames(String url, [int offset = 0]) async {
     debugPrint('url $url');
-    return http.get(Uri.encodeFull(url),
-        headers: {"Accept": "application/json"}).then((response) {
-      if (response.statusCode != 200) return [];
-      var body = json.decode(response.body);
-      List<Game> games =
-          body["results"].map<Game>((json) => Game.fromMap(json)).toList();
-      return db.backfillGames(games);
-    });
+    try {
+      return http.get(Uri.encodeFull(url),
+          headers: {"Accept": "application/json"}).then((response) {
+        if (response.statusCode != 200) return [];
+        var body = json.decode(response.body);
+        List<Game> games =
+            body["results"].map<Game>((json) => Game.fromMap(json)).toList();
+        return db.backfillGames(games);
+      });
+    } on SocketException {
+      debugPrint('offline');
+    }
+    return [];
   }
 
   Future<List<Game>> getSearch([int offset = 0]) async {
