@@ -10,50 +10,70 @@
   document.body.style.position = "fixed";
   document.body.style.backgroundColor = "black";
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(
-        function(registration) {
-          console.log('Service worker registration succeeded:', registration);
-        },
-        function(error) {
-          console.log('Service worker registration failed:', error);
-        });
-  } else {
-    console.log('Service workers are not supported.');
-  }
+  document.querySelector("#container").innerHTML = window.atob(`{{{html}}}`);
 
-  let code = window.atob(`{{{code}}}`);
-  let image_lookup = JSON.parse(window.atob(`{{{images}}}`));
-  let meta = {
-    debug : false,
-    name : `{{meta.name}}`,
-    instructions : `{{meta.instructions}}`,
-    boundaries : {{meta.boundaries}},
-    impulse : {{meta.impulse}},
-    gravity : {{meta.gravity}},
-    external_cache : function(key, value) {
-      // Possibly leverage the app to store extra information
-    },
-    cache_proxy : function(src, key) {
-      // Obviously make this endpoint.
-      // Should check cache, and if cache fails, it should then stream.
-      let lookup = src.split("gf://")[1];
-      if (lookup in image_lookup) {
-        src = image_lookup[lookup];
-      }
-      return "https://api.carolinaignites.org/cors/" + src;
-      // Uncomment this line if coors doesn't work.
-      // return src
-    },
-    set_score: function(score){SetScore.postMessage(score); window.__highscore = score;},
-    get_score: function(){GetScore.postMessage(0); return window.__highscore | 0;},
-    gameover_hook: function(){GameOver.postMessage();},
-  };
+  const CODE = window.atob(`{{{code}}}`);
+  const META = (function() {
+    let image_lookup = JSON.parse(window.atob(`{{{images}}}`));
+    let promise_set = new Set(`{{{image_keys}}}`.split("|"));
+    let faved = {{ faved }};
+    let promise_lookup = {};
+    return {
+      debug : false,
+      name : `{{meta.name}}`, // Name and instruction are sanitized on store.
+      instructions : `{{meta.instructions}}`,
+      boundaries : {{ meta.boundaries }},
+      impulse : {{ meta.impulse }},
+      gravity : {{ meta.gravity }},
+      external_cache : function(key, value) {
+        // Set our cache value
+        if (faved && !promise_set.has(key) && !(key in promise_lookup)) {
+          SetCache.postMessage(`${key}|${value}`);
+          promise_lookup[key] = new Promise(function(resolve) {
+            window.addEventListener("set|" + key, function(event) {
+              promise_set.add(key);
+              resolve(event.detail.data);
+            }, {once : true});
+          });
+        }
+      },
+      cache_proxy : function(src, key) {
+        // Obviously make this endpoint.
+        // Should check cache, and if cache fails, it should then stream.
+        let lookup = src.split("gf://")[1];
+        if (lookup in image_lookup) {
+          src = image_lookup[lookup];
+        }
+        if (faved) {
+          if (key in promise_lookup) {
+            return promise_lookup[key];
+          }
+          if (promise_set.has(key)) {
+            promise_lookup[key] = new Promise(function(resolve) {
+              window.addEventListener(
+                  key, function(event) { resolve(event.detail.data); },
+                  {once : true});
+            });
+            GetCache.postMessage(key);
+            return promise_lookup[key];
+          }
+        }
+        return "https://api.carolinaignites.org/cors/" + src;
+      },
+      cache_background : faved && !promise_set.has("background"),
+      set_score : function(score) {
+        SetScore.postMessage(score);
+        window.__highscore = score;
+      },
+      get_score : function() {
+        GetScore.postMessage(0);
+        return window.__highscore | 0;
+      },
+      gameover_hook : function() { GameOver.postMessage(""); },
+    };
+  })();
 
-  let container = document.querySelector("#container");
-  container.innerHTML = window.atob(`{{{html}}}`);
-
-  new GameFrame(meta, function(gf) {
+  new GameFrame(META, function(gf) {
     let collision = gf.collision;
     let gameOver = gf.gameOver;
     let score = gf.score;
@@ -62,7 +82,7 @@
     let registerLoops = gf.registerLoops;
     let template = gf.template;
     try {
-      eval(code);
+      eval(CODE);
     } catch (e) {
       var err = e.constructor(e.message);
       err.lineNumber = e.lineNumber - err.lineNumber + 3;

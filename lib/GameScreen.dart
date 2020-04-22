@@ -37,6 +37,14 @@ class GameScreenState extends State<GameScreen> {
     return null;
   }
 
+  Future<void> dispatchEvent(String key, String data) {
+    return _controller.evaluateJavascript(
+        "(function(){"
+        "let event = new CustomEvent(`${key}`, {detail: { data: `${data}` }});"
+        "window.dispatchEvent(event);"
+        "})();");
+  }
+
   wv.WebViewController _controller;
   @override
   void initState() {
@@ -63,7 +71,7 @@ class GameScreenState extends State<GameScreen> {
         javascriptChannels: Set.from([
           wv.JavascriptChannel(
               name: 'SetScore',
-              onMessageReceived: (wv.JavascriptMessage message) {
+              onMessageReceived: (wv.JavascriptMessage message) async {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
@@ -74,9 +82,8 @@ class GameScreenState extends State<GameScreen> {
           wv.JavascriptChannel(
               name: 'GetScore',
               onMessageReceived: (wv.JavascriptMessage message) async {
-                await _controller.evaluateJavascript(
+                _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");
-                return widget.game.highscore;
               }),
           wv.JavascriptChannel(
               name: 'GameOver',
@@ -84,8 +91,28 @@ class GameScreenState extends State<GameScreen> {
                 widget.game.plays += 1;
                 debugPrint("plays ${widget.game.plays}");
                 bloc.saveGame(widget.game);
+              }),
+          wv.JavascriptChannel(
+              name: 'SetCache',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                const String sep = "|";
+                List<String> key_value = message.message.split(sep);
+                String key = key_value[0];
+                String value = key_value.sublist(1).join(sep);
+                String data = await bloc.setImage(widget.game, key, value);
+                dispatchEvent("set|${key}", data);
+              }),
+          wv.JavascriptChannel(
+              name: 'GetCache',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                String key = message.message;
+                String data = await bloc.getImage(widget.game, key);
+                dispatchEvent(key, data);
               })
         ]),
+        navigationDelegate: (wv.NavigationRequest request) {
+          return wv.NavigationDecision.prevent;
+        },
         onWebViewCreated: (wv.WebViewController c) {
           _controller = c;
           builder.getPage().then((String page) {

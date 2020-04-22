@@ -88,7 +88,7 @@ class _IgniteCardState extends State<IgniteCard> {
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   ListTile(
                     title: Text(_game.name),
-                    subtitle: Text("Subtitle"),
+                    subtitle: Text(_game.subtitle ?? ""),
                   ),
                   ButtonBar(
                     children: <Widget>[

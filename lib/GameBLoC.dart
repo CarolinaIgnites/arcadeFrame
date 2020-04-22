@@ -194,6 +194,21 @@ class GameBLoC {
     }
   }
 
+  Future<String> setImage(Game game, String key, String value) async {
+    return db.setImage(game, key, value).then((data) {
+      if (data == null) {
+        return BLACK_PIXEL;
+      }
+      game.images.add(key.replaceAll("|", ""));
+      saveGame(game);
+      return data;
+    });
+  }
+
+  Future<String> getImage(Game game, String key) async {
+    return db.getImage(game, key).then((data) => data ?? BLACK_PIXEL);
+  }
+
   dispose() {
     searchController.dispose();
     _searchStreamController.close();

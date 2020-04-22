@@ -110,7 +110,8 @@ class _HomeScreenState extends State<_HomeScreen> {
                           channel: bloc.favoriteChannel,
                           hideable: true)),
                   new IgniteSection(
-                      title: "Popular Games", channel: bloc.popularChannel,
+                      title: "Popular Games",
+                      channel: bloc.popularChannel,
                       missing_message: ":( \n offline..."),
                   new IgniteSection(
                       title: "Search Results",
