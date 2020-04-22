@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flare_flutter/flare_actor.dart';
 
 import 'dart:async';
 import 'dart:math';
@@ -57,6 +56,8 @@ class _IgniteCardState extends State<IgniteCard> {
   update(Game game) {
     setState(() {
       if (widget.game.hash == game.hash) {
+        debugPrint(
+            "refresh ${widget.game.name}, ${widget.game.favourited}, ${game.favourited}");
         _refresh(game);
         paused = false;
       }
@@ -101,26 +102,7 @@ class _IgniteCardState extends State<IgniteCard> {
                             style: TextStyle(fontFamily: "arcadeclassic")),
                         onPressed: () {/* // TODO: Maybe show total plays */},
                       ),
-                      // TODO: Break out into own component.
-                      // new Like(_game, widget.bloc),
-                      FlatButton(
-                          child: Container(
-                              width: 32,
-                              height: 32,
-                              child: new FlareActor("assets/icons/heart.flr",
-                                  isPaused: paused,
-                                  snapToEnd: paused,
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.contain,
-                                  animation: _game.favourited ^ paused
-                                      ? "Like"
-                                      : "Unlike")),
-                          onPressed: () {
-                            _game.favourited = !_game.favourited;
-                            widget.bloc.saveGame(_game).then((game) {
-                              widget.bloc.favoriteChannel.request();
-                            });
-                          })
+                      new Like(widget.game, widget.bloc, paused),
                     ],
                   ),
                 ]))));

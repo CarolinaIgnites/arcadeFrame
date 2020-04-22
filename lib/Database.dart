@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'Game.dart';
 import 'Migration.dart';
+import 'package:flutter/foundation.dart';
 
 // I just followed some medium article honestly:
 // https://medium.com/flutter-community/using-sqlite-in-flutter-187c1a82e8b
@@ -51,6 +52,7 @@ class DBProvider {
 
   Future<Game> newGame(Game game) async {
     final db = await database;
+    game.saved = true;
     try {
       await db.rawInsert(
           "INSERT Into Games "
@@ -60,14 +62,15 @@ class DBProvider {
             game.hash,
             game.name,
             game.description,
+            game.subtitle,
+            game.images.join("|"),
             game.json,
-            0,
+            game.highscore,
             game.plays,
             game.favourited,
-            1,
+            game.saved,
           ]);
     } on DatabaseException {
-      game.saved = true;
       return updateGame(game);
     }
     return game;
@@ -75,6 +78,7 @@ class DBProvider {
 
   Future<Game> updateGame(Game game) async {
     final db = await database;
+    debugPrint("${game.toMap()}");
     await db.update("Games", game.toMap(),
         where: "hash = ?", whereArgs: [game.hash]);
     return game;
@@ -101,7 +105,7 @@ class DBProvider {
 
   Future<List<Game>> getFavoriteGames([int offset = 0]) async {
     final db = await database;
-    // TODO: Offset?
+    // TODO: Offset requires pagination and a limit.
     var res = await db.query("Games", where: "favourited = ? ", whereArgs: [1]);
     List<Game> list =
         res.isNotEmpty ? res.map((c) => Game.fromRow(c)).toList() : [];

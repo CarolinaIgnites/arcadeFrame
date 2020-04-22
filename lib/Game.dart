@@ -22,16 +22,16 @@ class Game {
   bool saved;
 
   Game({
-    this.hash,
-    this.name,
-    this.description,
-    this.subtitle,
+    this.hash = "",
+    this.name = "",
+    this.description = "",
+    this.subtitle = "",
     this.images,
-    this.json,
-    this.highscore,
-    this.plays,
-    this.favourited,
-    this.saved,
+    this.json = "",
+    this.highscore = 0,
+    this.plays = 0,
+    this.favourited = false,
+    this.saved = false,
   });
 
   // API is out of sync from this. Ideally fix. Too lazy rn.
@@ -53,13 +53,13 @@ class Game {
   factory Game.fromRow(Map<String, dynamic> json) => new Game(
         hash: json["hash"],
         name: json["name"],
-        description: json["description"],
-        subtitle: json["subtitle"],
+        description: json["description"] ?? "",
+        subtitle: json["subtitle"] ?? "",
         images: (json["images"] ?? "").split("|"),
-        json: json["json"],
-        highscore: json["highscore"],
-        plays: json["plays"],
-        favourited: json["favourited"] == 1,
+        json: json["json"] ?? "",
+        highscore: json["highscore"] ?? 0,
+        plays: json["plays"] ?? 0,
+        favourited: (json["favourited"] ?? 0) == 1,
         saved: true,
       );
 

@@ -8,10 +8,15 @@ class IgniteDrawer extends StatelessWidget {
     return new Drawer(
       child: ListView(
         children: <Widget>[
+          new ListTile(
+            title: Text('Games'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
           new IgniteDialog(title: "About Us", page: ABOUT_PAGE),
           new IgniteDialog(title: "Licenses", page: LICENSE_PAGE),
-          new IgniteDialog(
-              title: "Privacy Policy", page: PRIVACY_PAGE),
+          new IgniteDialog(title: "Privacy Policy", page: PRIVACY_PAGE),
         ],
       ),
     );
