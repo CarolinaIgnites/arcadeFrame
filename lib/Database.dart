@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'Constants.dart';
 import 'Game.dart';
 import 'Migration.dart';
 import 'package:flutter/foundation.dart';
@@ -25,7 +26,7 @@ class DBProvider {
     String path = join(documentsDirectory.path, "games.db");
     return await openDatabase(path, version: 2, onOpen: (db) async {
       // Perform a bit of cleanup on open.
-      db.execute("DELETE from Images "
+      db.execute("DELETE from Images"
           "  where key in ("
           "    select distinct i.key"
           "    from Images i"
@@ -33,6 +34,9 @@ class DBProvider {
           "    Games g on i.game = g.hash"
           "    where"
           "      i.game IS NULL or g.favourited = 0);");
+      db.execute("DELETE from Games"
+          "  where favourited = 0"
+          "    and substr(hash, 1, 10) != '${PUBLISHED}';");
       // TODO: Potentially load things here.
     }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
       // Schema changes should be reflected in this function.  Version 1 -> 2

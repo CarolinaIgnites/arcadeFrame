@@ -81,21 +81,20 @@ class GameBLoC {
 
   // Check if we already have the data, otherwise load it.
   Future<Game> queryGame(String hash) async {
-    debugPrint("length ${hash.length} $hash");
-    debugPrint("${hash.substring(0, KEY_OFFSET)}");
     String key = hash;
     if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
     }
     try {
-      return http.get(Uri.encodeFull("$API_ENDPOINT/$key"),
+      return http.get(Uri.encodeFull("$API_ENDPOINT/d/$key"),
           headers: {"Accept": "application/json"}).then((response) {
         if (response.statusCode != 200) return null;
         var body = json.decode(response.body);
-        String data = utf8.decode(base64.decode(body["data"]));
+        if (!body["valid"]) return null;
+        if (body["json"] != ""){
+          body["json"] = utf8.decode(base64.decode(body["json"]));
+        }
         Game game = Game.fromMap(body);
-        game.json = data;
-        debugPrint("$data");
         db.updateGame(game);
         return game;
       });
