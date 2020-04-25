@@ -31,7 +31,6 @@ class _LikeState extends State<Like> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("build ${widget.game.name}");
     return FlatButton(
         child: Container(
             width: 32,
@@ -45,13 +44,7 @@ class _LikeState extends State<Like> {
                     ? "Like"
                     : "Unlike")),
         onPressed: () {
-          debugPrint("was ${widget.game.favourited}");
-          widget.game.favourited = !widget.game.favourited;
-          debugPrint("now ${widget.game.favourited}");
-          widget.bloc.saveGame(widget.game).then((game) {
-            debugPrint("and now ${game.favourited}");
-            widget.bloc.favoriteChannel.request();
-          });
+          widget.bloc.toggleLike(widget.game);
         });
   }
 }

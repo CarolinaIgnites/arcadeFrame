@@ -18,6 +18,10 @@
     let promise_set = new Set(`{{{image_keys}}}`.split("|"));
     let faved = {{ faved }};
     let promise_lookup = {};
+    let likeClasses = [ "fav", "glyphicon", "glyphicon-heart" ];
+    if (faved) {
+      likeClasses[likeClasses.length] = "liked"
+    }
     return {
       debug : false,
       name : `{{meta.name}}`, // Name and instruction are sanitized on store.
@@ -70,6 +74,33 @@
         return window.__highscore | 0;
       },
       gameover_hook : function() { GameOver.postMessage(""); },
+      modal_hooks : [
+        {
+          "classes" : [ "report", "glyphicon", "glyphicon-flag" ],
+          "onclick" : () => {
+            // TODO: Prompt does not work.
+            let report = prompt("Help us understand the problem. What's wrong with this game?");
+            if (report) {
+              Report.postMessage(report);
+              alert("Thanks. We'll look into it soon.");
+            }
+          }
+        },
+        {
+          "classes" : likeClasses,
+          "onclick" : () => {
+            let fav = document.querySelector(".fav").classList.toggle("liked");
+            ToggleLike.postMessage(0);
+            faved = !faved;
+          }
+        },
+        {
+          "classes" : [ "share", "glyphicon", "glyphicon-share-alt" ],
+          "onclick" : () => {
+            Share.postMessage(0);
+          }
+        },
+      ]
     };
   })();
 

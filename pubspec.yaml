@@ -23,11 +23,7 @@ dependencies:
   async:
   http:
   path_provider:
-  # probably clean up one of these
-  auto_orientation: ^1.0.1
-  native_device_orientation: ^0.2.0
   # Webview
-  flutter_webview_plugin: 0.3.10+1
   webview_flutter: ^0.3.7
   #DB
   sqflite: any
@@ -36,10 +32,12 @@ dependencies:
   flutter_markdown: ^0.3.5
   # Analytics
   firebase_core: ^0.4.0+9
-  firebase_analytics: ^5.0.6
+  firebase_analytics: ^5.0.11
+  # Share
+  share: ^0.6.4
   # UI
   cupertino_icons: ^0.1.2
-  material_design_icons_flutter: 3.2.3695
+  #material_design_icons_flutter: 3.2.3695
   flare_flutter:
   # QR code
   uni_links:

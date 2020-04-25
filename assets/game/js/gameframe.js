@@ -17,6 +17,7 @@ var GameFrame;
   // time vars
   let t = 0;
   let pt = 0;
+  let running = true;
 
   /// Global physics vars
   let world;
@@ -31,7 +32,7 @@ var GameFrame;
     39 : "right",
   }
 
-  // Our set dimension values. These are chosent o represent commpon laptop
+  // Our set dimension values. These are chosen to represent common laptop
   // aspect ratios.
   const WIDTH = 1366;
   const HEIGHT = 768;
@@ -208,7 +209,7 @@ var GameFrame;
     style = document.createElement("style");
     clipboard = document.createElement("canvas");
     context = clipboard.getContext("2d");
-    children = game.children;
+    children = game.children || [];
   };
 
   // Render dom to page
@@ -246,13 +247,16 @@ var GameFrame;
     }
 
     // Create modal if needed
-    if (!GameFrame.prototype.modal)
+    if (!GameFrame.prototype.modal) {
+      GameFrame.prototype.init()
       return;
+    }
     modal.id = "modal";
     modal.innerHTML = `
             <div id="box">
                 <h1 id="modal-title"></h1>
                 <div id="comment"></div>
+                <div id="hooks"></div>
                 <button type="button"
                         id="button"
                         onclick="GameFrame.prototype.init()"
@@ -266,6 +270,16 @@ var GameFrame;
     document.getElementById("modal-title").innerHTML = GameFrame.prototype.name;
     document.getElementById("comment").innerHTML =
         GameFrame.prototype.instructions;
+    if (GameFrame.prototype.modal_hooks.length > 0) {
+      let hooks = document.getElementById("hooks");
+      let modal_hooks = GameFrame.prototype.modal_hooks;
+      for (const key in modal_hooks) {
+        let hook = document.createElement("span");
+        hook.addEventListener("click", modal_hooks[key]["onclick"]);
+        hook.classList.add(...modal_hooks[key]["classes"]);
+        hooks.appendChild(hook);
+      }
+    }
   };
 
   // Create the object
@@ -389,11 +403,13 @@ var GameFrame;
 
       // Set up step
       world.on('step', function() {
-        let dt = t - pt;
-        for (let i = 0; i < loops.length; i++) {
-          loops[i](lookup, dt);
+        if (running) {
+          let dt = t - pt;
+          for (let i = 0; i < loops.length; i++) {
+            loops[i](lookup, dt);
+          }
+          world.render();
         }
-        world.render();
       });
 
       // subscribe to ticker to advance the simulation
@@ -447,7 +463,11 @@ var GameFrame;
     GameFrame.prototype.gravity =
         "gravity" in settings ? settings["gravity"] : false;
     GameFrame.prototype.debug = "debug" in settings ? settings["debug"] : false;
+
+    // Modal and modal injection settings.
     GameFrame.prototype.modal = "modal" in settings ? settings["modal"] : true;
+    GameFrame.prototype.modal_hooks =
+        "modal_hooks" in settings ? settings["modal_hooks"] : {};
 
     // For external caching
     GameFrame.prototype.external_cache = "external_cache" in settings
@@ -456,9 +476,8 @@ var GameFrame;
     GameFrame.prototype.cache_proxy = "cache_proxy" in settings
                                           ? settings["cache_proxy"]
                                           : function(src) { return src; };
-    GameFrame.prototype.cache_background = "cache_background" in settings
-                                          ? settings["cache_background"]
-                                          : false;
+    GameFrame.prototype.cache_background =
+        "cache_background" in settings ? settings["cache_background"] : false;
 
     // For external score keeping
     GameFrame.prototype.set_score =
@@ -550,10 +569,7 @@ var GameFrame;
       img.setAttribute('crossOrigin', 'anonymous');
       img.onload = clip[type](obj, img, src);
       Promise.resolve(GameFrame.prototype.cache_proxy(src, cache.key(obj, src)))
-          .then(function(src) {
-            console.log("promised", src);
-            img.src = src;
-          });
+          .then(function(src) { img.src = src; });
     }
   };
 
@@ -585,6 +601,16 @@ var GameFrame;
       GameFrame.prototype.set_score(score);
     }
     scoreboard.innerHTML = "Score: " + score;
+  };
+
+  // Pause or resume the game
+  GameFrame.prototype.pause = function() {
+    world.pause();
+    running = false;
+  };
+  GameFrame.prototype.unpause = function() {
+    world.unpause();
+    running = true;
   };
 
   // Restart the game and physics

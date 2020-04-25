@@ -12,10 +12,6 @@ import "components/Drawer.dart";
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-
-final FirebaseAnalytics analytics = FirebaseAnalytics();
-
 class ArcadeFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -80,7 +76,7 @@ class _HomeScreenState extends State<_HomeScreen> {
     Game game = await bloc.queryGame(segs[1]);
     if (game == null) return;
 
-    bloc.viewGame(game, context);
+    bloc.viewGame(game, context, "QR");
   }
 
   @override

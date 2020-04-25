@@ -40,8 +40,9 @@ class Game {
         name: limit_string(json["title"] ?? "Untitled", 30),
         description:
             limit_string(json["instructions"] ?? "No instructions", 500),
-        subtitle:
-            limit_string(json["subtitle"] ?? json["instructions"] ?? "", 50),
+        subtitle: limit_string(
+            (json["subtitle"] ?? json["instructions"] ?? "").split("\n")[0],
+            25),
         images: [],
         json: json["json"],
         highscore: 0,

@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+
+import "Analytics.dart";
 import "Game.dart";
 import "GameScreen.dart";
 import "Database.dart";
@@ -91,7 +93,7 @@ class GameBLoC {
         if (response.statusCode != 200) return null;
         var body = json.decode(response.body);
         if (!body["valid"]) return null;
-        if (body["json"] != ""){
+        if (body["json"] != "") {
           body["json"] = utf8.decode(base64.decode(body["json"]));
         }
         Game game = Game.fromMap(body);
@@ -193,15 +195,38 @@ class GameBLoC {
     return db.getFavoriteGames(offset);
   }
 
-  // TODO: Add logging to FB
-  viewGame(Game game, context) async {
-    debugPrint("Here thugh");
+  viewGame(Game game, context, [String caller="home"]) async {
+    analytics.logEvent(
+      name: "start",
+      parameters: <String, dynamic>{
+        'game': game.hash,
+        'title': game.name,
+        'plays': game.plays,
+        'caller': caller,
+      },
+    );
     if (game != null) {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => GameScreen(game: game, bloc: this)));
     }
+  }
+
+  toggleLike(Game game, [String caller="home"]) async {
+          game.favourited = !game.favourited;
+          saveGame(game).then((game) {
+            favoriteChannel.request();
+          });
+          var like = game.favourited ? "like" : "unlike";
+          analytics.logEvent(
+            name: like,
+            parameters: <String, dynamic>{
+              'game': game.hash,
+              'plays': game.plays,
+              'context': "home",
+            },
+          );
   }
 
   Future<String> setImage(Game game, String key, String value) async {

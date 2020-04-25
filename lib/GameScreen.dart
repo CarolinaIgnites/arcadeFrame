@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as wv;
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
-import 'package:auto_orientation/auto_orientation.dart';
+//import 'package:auto_orientation/auto_orientation.dart';
+import 'package:share/share.dart';
 
+import "Analytics.dart";
 import "Game.dart";
 import "GameBLoC.dart";
 import "PageBuilder.dart";
@@ -22,7 +24,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
-  final flutterWebViewPlugin = FlutterWebviewPlugin();
+  //final flutterWebViewPlugin = FlutterWebviewPlugin();
   final PageBuilder builder = PageBuilder();
   GameBLoC bloc;
 
@@ -53,7 +55,7 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    AutoOrientation.landscapeRightMode();
+    //AutoOrientation.landscapeRightMode();
     bloc = widget.bloc;
   }
 
@@ -74,7 +76,6 @@ class GameScreenState extends State<GameScreen> {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
-                  debugPrint("the json ${widget.game.json}");
                   bloc.saveGame(widget.game);
                 }
               }),
@@ -88,8 +89,15 @@ class GameScreenState extends State<GameScreen> {
               name: 'GameOver',
               onMessageReceived: (wv.JavascriptMessage message) async {
                 widget.game.plays += 1;
-                debugPrint("plays ${widget.game.plays}");
                 bloc.saveGame(widget.game);
+                analytics.logEvent(
+                  name: 'play',
+                  parameters: <String, dynamic>{
+                    'game': widget.game.hash,
+                    'title': widget.game.name,
+                    'plays': widget.game.plays,
+                  },
+                );
               }),
           wv.JavascriptChannel(
               name: 'SetCache',
@@ -107,6 +115,39 @@ class GameScreenState extends State<GameScreen> {
                 String key = message.message;
                 String data = await bloc.getImage(widget.game, key);
                 dispatchEvent(key, data);
+              }),
+          wv.JavascriptChannel(
+              name: 'ToggleLike',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                widget.bloc.toggleLike(widget.game, "in game");
+              }),
+          wv.JavascriptChannel(
+              name: 'Report',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                analytics.logEvent(
+                  name: 'report',
+                  parameters: <String, dynamic>{
+                    'game': widget.game.hash,
+                    'title': widget.game.name,
+                    'plays': widget.game.plays,
+                    'message': message.message,
+                  },
+                );
+              }),
+          wv.JavascriptChannel(
+              name: 'Share',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                Share.share(
+                    '${widget.game.name}: https://api.carolinaignites.org/app/${widget.game.hash}',
+                    subject: 'Try this game:');
+                analytics.logEvent(
+                  name: 'share',
+                  parameters: <String, dynamic>{
+                    'game': widget.game.hash,
+                    'title': widget.game.name,
+                    'plays': widget.game.plays,
+                  },
+                );
               })
         ]),
         navigationDelegate: (wv.NavigationRequest request) {
@@ -125,11 +166,11 @@ class GameScreenState extends State<GameScreen> {
   void dispose() {
     super.dispose();
     isActive = false;
-    flutterWebViewPlugin.dispose();
+    //flutterWebViewPlugin.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AutoOrientation.portraitUpMode();
+    // AutoOrientation.portraitUpMode();
   }
 }

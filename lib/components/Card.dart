@@ -56,8 +56,6 @@ class _IgniteCardState extends State<IgniteCard> {
   update(Game game) {
     setState(() {
       if (widget.game.hash == game.hash) {
-        debugPrint(
-            "refresh ${widget.game.name}, ${widget.game.favourited}, ${game.favourited}");
         _refresh(game);
         paused = false;
       }
