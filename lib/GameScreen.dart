@@ -86,6 +86,7 @@ class GameScreenState extends State<GameScreen> {
           wv.JavascriptChannel(
               name: 'GameOver',
               onMessageReceived: (wv.JavascriptMessage message) async {
+                var score = int.parse(message.message);
                 widget.game.plays += 1;
                 bloc.saveGame(widget.game);
                 analytics.logEvent(
@@ -94,6 +95,8 @@ class GameScreenState extends State<GameScreen> {
                     'game': widget.game.hash,
                     'title': widget.game.name,
                     'plays': widget.game.plays,
+                    'highscore': widget.game.highscore,
+                    'score': score,
                   },
                 );
               }),

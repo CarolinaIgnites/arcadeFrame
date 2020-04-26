@@ -73,7 +73,7 @@
         GetScore.postMessage(0);
         return window.__highscore | 0;
       },
-      gameover_hook : function() { GameOver.postMessage(""); },
+      gameover_hook : function() { GameOver.postMessage(window.__highscore | 0); },
       modal_hooks : [
         {
           "classes" : [ "report", "svg-icon", "svg-report" ],
