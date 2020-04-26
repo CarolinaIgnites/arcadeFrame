@@ -114,7 +114,6 @@ class GameBLoC {
 
   Future<bool> _getFavorites() {
     return getFavoriteGames().then((results) {
-      debugPrint("${results}");
       _favoriteStreamController.add(results);
       return results != null && results.length == 5;
     });
