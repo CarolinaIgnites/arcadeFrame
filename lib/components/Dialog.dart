@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../Colors.dart';
 
 class IgniteDialog extends StatelessWidget {
@@ -33,7 +34,18 @@ class IgniteDialog extends StatelessWidget {
                               AsyncSnapshot<String> snapshot) {
                             if (snapshot.hasData) {
                               return Markdown(
-                                  selectable: true, data: snapshot.data);
+                                  selectable: false,
+                                  data: snapshot.data,
+                                  onTapLink: (String url) async {
+                                    debugPrint(url);
+                                    if (await canLaunch(url)) {
+                                      await launch(
+                                        url,
+                                        forceSafariVC: false,
+                                        forceWebView: false,
+                                      );
+                                    }
+                                  });
                             }
 
                             return Markdown(data: "## Loading...");

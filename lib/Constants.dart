@@ -51,5 +51,10 @@ const List<List<String>> CSS_ASSETS_BY_PRIORITY = [
 
 // Information pages in Nav Drawer
 const String ABOUT_PAGE = "assets/pages/about.md";
-const String LICENSE_PAGE = "assets/pages/license.md";
+const String FAQ_PAGE = "assets/pages/faq.md";
+const String LEGAL_PAGE = "assets/pages/legal.md";
 const String PRIVACY_PAGE = "assets/pages/privacy.md";
+const String LICENSE_PAGE = "assets/pages/license.md";
+
+// Max size of elements on the home page.
+const double VIEW_SIZE = 600;

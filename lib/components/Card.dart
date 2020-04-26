@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 
+import "../Constants.dart";
 import "../Colors.dart";
 import "../Game.dart";
 import "../GameBLoC.dart";
@@ -65,11 +66,13 @@ class _IgniteCardState extends State<IgniteCard> {
   @override
   Widget build(BuildContext context) {
     _refresh(widget.game);
+    double width = MediaQuery.of(context).size.width;
+    double adjustment = (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
     return new Card(
         color: BACKGROUND_COLOR,
-        margin: const EdgeInsets.only(
-          right: 30,
-          left: 50,
+        margin: EdgeInsets.only(
+          right: adjustment + 30,
+          left: adjustment + 50,
           top: 5,
           bottom: 5,
         ),

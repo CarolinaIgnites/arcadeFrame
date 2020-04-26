@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "../Constants.dart";
 import "../Colors.dart";
 
 class IgniteHeader extends StatefulWidget {
@@ -16,11 +17,13 @@ class IgniteHeader extends StatefulWidget {
 class _IgniteHeaderState extends State<IgniteHeader> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double adjustment = (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
     return Stack(children: <Widget>[
       new Positioned(
           top: widget.scroll,
           child: Padding(
-              padding: EdgeInsets.only(top: 10, left: 20),
+              padding: EdgeInsets.only(top: 10, left: adjustment + 20),
               child: Row(children: [
                 Column(children: [
                   Row(children: <Widget>[

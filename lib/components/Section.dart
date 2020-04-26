@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "../Constants.dart";
 import "../Colors.dart";
 import "../Game.dart";
 import "../GameBLoC.dart";
@@ -57,8 +58,11 @@ class _IgniteSectionState extends State<IgniteSection> {
               }
 
               if (index == 0) {
+                double width = MediaQuery.of(context).size.width;
+                double adjustment =
+                    (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
                 return Padding(
-                    padding: EdgeInsets.only(left: 20),
+                    padding: EdgeInsets.only(left: adjustment + 20),
                     child: new Text("${widget.title}",
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.width * 0.05,

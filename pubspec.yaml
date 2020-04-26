@@ -41,6 +41,7 @@ dependencies:
   games_services: ^0.2.6
   # QR code
   uni_links:
+  url_launcher:
 
 dev_dependencies:
   flutter_test:
@@ -81,7 +82,10 @@ flutter:
     - assets/game/js/jquery.min.js
     - assets/game/js/nipplejs.js
     - assets/game/js/physicsjs-full.min.js
+    # Pages
     - assets/pages/about.md
+    - assets/pages/faq.md
+    - assets/pages/legal.md
     - assets/pages/privacy.md
     - assets/pages/license.md
 

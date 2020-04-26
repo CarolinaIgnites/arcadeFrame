@@ -10,6 +10,8 @@ import "Game.dart";
 import "GameBLoC.dart";
 import "PageBuilder.dart";
 
+import "components/Report.dart";
+
 class GameScreen extends StatefulWidget {
   final Game game;
   final GameBLoC bloc;
@@ -43,7 +45,6 @@ class GameScreenState extends State<GameScreen> {
         "})();");
   }
 
-  TextEditingController _textFieldController = TextEditingController();
   wv.WebViewController _controller;
   @override
   void initState() {
@@ -116,7 +117,7 @@ class GameScreenState extends State<GameScreen> {
           wv.JavascriptChannel(
               name: 'ToggleLike',
               onMessageReceived: (wv.JavascriptMessage message) async {
-                widget.bloc.toggleLike(widget.game, "in game");
+                widget.bloc.toggleLike(widget.game, "in_game");
               }),
           wv.JavascriptChannel(
               name: 'Report',
@@ -124,32 +125,7 @@ class GameScreenState extends State<GameScreen> {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      // TODO: Break into components
-                      return AlertDialog(
-                        title: Text('Report a game'),
-                        content: TextField(
-                          controller: _textFieldController,
-                          decoration:
-                              InputDecoration(hintText: "Tell us what's wrong with the game."),
-                        ),
-                        actions: <Widget>[
-                          new FlatButton(
-                            child: new Text('REPORT'),
-                            onPressed: () {
-                              analytics.logEvent(
-                                name: 'report',
-                                parameters: <String, dynamic>{
-                                  'game': widget.game.hash,
-                                  'title': widget.game.name,
-                                  'plays': widget.game.plays,
-                                  'message': _textFieldController.text,
-                                },
-                              );
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
+                      return IgniteReport();
                     });
               }),
           wv.JavascriptChannel(
@@ -157,7 +133,7 @@ class GameScreenState extends State<GameScreen> {
               onMessageReceived: (wv.JavascriptMessage message) async {
                 Share.share(
                     '${widget.game.name}: https://api.carolinaignites.org/app/${widget.game.hash}',
-                    subject: 'Try this game:');
+                    subject: 'Try out this game:');
                 analytics.logEvent(
                   name: 'share',
                   parameters: <String, dynamic>{
