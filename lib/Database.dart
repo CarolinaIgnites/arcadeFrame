@@ -87,7 +87,6 @@ class DBProvider {
 
   Future<Game> updateGame(Game game) async {
     final db = await database;
-    debugPrint("${game.toMap()}");
     await db.update("Games", game.toMap(),
         where: "hash = ?", whereArgs: [game.hash]);
     return game;
