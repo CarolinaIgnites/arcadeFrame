@@ -2,9 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as wv;
-//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
-//import 'package:auto_orientation/auto_orientation.dart';
 import 'package:share/share.dart';
 
 import "Analytics.dart";
@@ -24,7 +22,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
-  //final flutterWebViewPlugin = FlutterWebviewPlugin();
   final PageBuilder builder = PageBuilder();
   GameBLoC bloc;
 
@@ -46,6 +43,7 @@ class GameScreenState extends State<GameScreen> {
         "})();");
   }
 
+  TextEditingController _textFieldController = TextEditingController();
   wv.WebViewController _controller;
   @override
   void initState() {
@@ -55,7 +53,6 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    //AutoOrientation.landscapeRightMode();
     bloc = widget.bloc;
   }
 
@@ -124,15 +121,36 @@ class GameScreenState extends State<GameScreen> {
           wv.JavascriptChannel(
               name: 'Report',
               onMessageReceived: (wv.JavascriptMessage message) async {
-                analytics.logEvent(
-                  name: 'report',
-                  parameters: <String, dynamic>{
-                    'game': widget.game.hash,
-                    'title': widget.game.name,
-                    'plays': widget.game.plays,
-                    'message': message.message,
-                  },
-                );
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      // TODO: Break into components
+                      return AlertDialog(
+                        title: Text('Report a game'),
+                        content: TextField(
+                          controller: _textFieldController,
+                          decoration:
+                              InputDecoration(hintText: "Tell us what's wrong with the game."),
+                        ),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text('REPORT'),
+                            onPressed: () {
+                              analytics.logEvent(
+                                name: 'report',
+                                parameters: <String, dynamic>{
+                                  'game': widget.game.hash,
+                                  'title': widget.game.name,
+                                  'plays': widget.game.plays,
+                                  'message': _textFieldController.text,
+                                },
+                              );
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      );
+                    });
               }),
           wv.JavascriptChannel(
               name: 'Share',
@@ -166,11 +184,9 @@ class GameScreenState extends State<GameScreen> {
   void dispose() {
     super.dispose();
     isActive = false;
-    //flutterWebViewPlugin.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    // AutoOrientation.portraitUpMode();
   }
 }

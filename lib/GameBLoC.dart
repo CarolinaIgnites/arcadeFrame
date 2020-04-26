@@ -195,7 +195,7 @@ class GameBLoC {
     return db.getFavoriteGames(offset);
   }
 
-  viewGame(Game game, context, [String caller="home"]) async {
+  viewGame(Game game, context, [String caller = "home"]) async {
     analytics.logEvent(
       name: "start",
       parameters: <String, dynamic>{
@@ -213,20 +213,20 @@ class GameBLoC {
     }
   }
 
-  toggleLike(Game game, [String caller="home"]) async {
-          game.favourited = !game.favourited;
-          saveGame(game).then((game) {
-            favoriteChannel.request();
-          });
-          var like = game.favourited ? "like" : "unlike";
-          analytics.logEvent(
-            name: like,
-            parameters: <String, dynamic>{
-              'game': game.hash,
-              'plays': game.plays,
-              'context': "home",
-            },
-          );
+  toggleLike(Game game, [String caller = "home"]) async {
+    game.favourited = !game.favourited;
+    saveGame(game).then((game) {
+      favoriteChannel.request();
+    });
+    var like = game.favourited ? "like" : "unlike";
+    analytics.logEvent(
+      name: like,
+      parameters: <String, dynamic>{
+        'game': game.hash,
+        'plays': game.plays,
+        'context': "home",
+      },
+    );
   }
 
   Future<String> setImage(Game game, String key, String value) async {

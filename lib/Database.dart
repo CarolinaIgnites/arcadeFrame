@@ -34,6 +34,11 @@ class DBProvider {
           "    Games g on i.game = g.hash"
           "    where"
           "      i.game IS NULL or g.favourited = 0);");
+      // Previously saved games shouldn't think that they have images.
+      db.execute("Update Games"
+          "  set images=''"
+          "  where favourited = 0;");
+      // Don't save unpublished games unless we have them faved.
       db.execute("DELETE from Games"
           "  where favourited = 0"
           "    and substr(hash, 1, 10) != '${PUBLISHED}';");

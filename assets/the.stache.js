@@ -18,9 +18,9 @@
     let promise_set = new Set(`{{{image_keys}}}`.split("|"));
     let faved = {{ faved }};
     let promise_lookup = {};
-    let likeClasses = [ "fav", "glyphicon", "glyphicon-heart" ];
+    let likeClasses = [ "fav", "svg-icon", "svg-heart" ];
     if (faved) {
-      likeClasses[likeClasses.length] = "liked"
+      likeClasses[likeClasses.length] = "svg-liked"
     }
     return {
       debug : false,
@@ -76,28 +76,27 @@
       gameover_hook : function() { GameOver.postMessage(""); },
       modal_hooks : [
         {
-          "classes" : [ "report", "glyphicon", "glyphicon-flag" ],
+          "classes" : [ "report", "svg-icon", "svg-report" ],
           "onclick" : () => {
-            // TODO: Prompt does not work.
-            let report = prompt("Help us understand the problem. What's wrong with this game?");
-            if (report) {
-              Report.postMessage(report);
+            //let report = prompt("Help us understand the problem. What's wrong with this game?");
+            //if (report) {
+              Report.postMessage(0);
               alert("Thanks. We'll look into it soon.");
-            }
+            //}
+          }
+        },
+        {
+          "classes" : [ "share", "svg-icon", "svg-share" ],
+          "onclick" : () => {
+            Share.postMessage(0);
           }
         },
         {
           "classes" : likeClasses,
           "onclick" : () => {
-            let fav = document.querySelector(".fav").classList.toggle("liked");
+            let fav = document.querySelector(".fav").classList.toggle("svg-liked");
             ToggleLike.postMessage(0);
             faved = !faved;
-          }
-        },
-        {
-          "classes" : [ "share", "glyphicon", "glyphicon-share-alt" ],
-          "onclick" : () => {
-            Share.postMessage(0);
           }
         },
       ]

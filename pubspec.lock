@@ -141,13 +141,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.2"
   dart_style:
     dependency: transitive
     description:
@@ -214,6 +207,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.21+1"
+  games_services:
+    dependency: "direct main"
+    description:
+      name: games_services
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.6"
   glob:
     dependency: transitive
     description:

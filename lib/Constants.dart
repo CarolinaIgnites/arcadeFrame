@@ -46,7 +46,7 @@ const List<List<String>> JS_ASSETS_BY_PRIORITY = [
 ];
 const List<List<String>> CSS_ASSETS_BY_PRIORITY = [
   ["assets/game/css/minimal.css"],
-  ["assets/game/css/gameframe.css"],
+  ["assets/game/css/gameframe.css", "assets/game/css/arcadeframe.css"],
 ];
 
 // Information pages in Nav Drawer

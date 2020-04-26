@@ -9,6 +9,9 @@ import "components/Nav.dart";
 import "components/Header.dart";
 import "components/Drawer.dart";
 
+import 'package:games_services/games_services.dart';
+import 'package:games_services/achievement.dart';
+
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
@@ -36,6 +39,7 @@ class _HomeScreenState extends State<_HomeScreen> {
   void initState() {
     super.initState();
 
+    GamesServices.signIn();
     bloc = GameBLoC();
     initUniLinks();
   }
@@ -76,6 +80,8 @@ class _HomeScreenState extends State<_HomeScreen> {
     Game game = await bloc.queryGame(segs[1]);
     if (game == null) return;
 
+    GamesServices.unlock(
+        achievement: Achievement(androidID: 'CgkI_LTI16kKEAIQAQ'));
     bloc.viewGame(game, context, "QR");
   }
 
