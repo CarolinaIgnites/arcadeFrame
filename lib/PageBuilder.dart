@@ -46,10 +46,9 @@ class PageBuilder {
   // Check if we already have the data, otherwise load it.
   Future<String> _queryGame(Game game, GameBLoC bloc) async {
     debugPrint(game.json);
-    if (game.json != null) {
-      return game.json;
+    if (game.json == null) {
+      game = await bloc.queryGame(game.hash);
     }
-    game = await bloc.queryGame(game.hash);
     return game.json;
   }
 
@@ -105,7 +104,11 @@ class PageBuilder {
     // Now we load the game.
     _loadTemplate().then((template) {
       return _queryGame(game, bloc).then((data) {
-        controller.evaluateJavascript(template.renderString(json.decode(data)));
+        game.json = data;
+        var template_data = json.decode(data);
+        template_data["image_keys"] = game.images.join("|");
+        template_data["faved"] = game.favourited;
+        controller.evaluateJavascript(template.renderString(template_data));
       });
     });
   }

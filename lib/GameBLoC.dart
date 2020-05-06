@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+
+import "Analytics.dart";
 import "Game.dart";
 import "GameScreen.dart";
 import "Database.dart";
@@ -80,21 +83,26 @@ class GameBLoC {
 
   // Check if we already have the data, otherwise load it.
   Future<Game> queryGame(String hash) async {
-    debugPrint("length ${hash.length} $hash");
     String key = hash;
-    if (key.length > KEY_SIZE) {
+    if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
     }
-    return http.get(Uri.encodeFull("$API_ENDPOINT/$key"),
-        headers: {"Accept": "application/json"}).then((response) {
-      var body = json.decode(response.body);
-      String data = utf8.decode(base64.decode(body["data"]));
-      Game game = Game.fromMap(body);
-      game.json = data;
-      debugPrint("$data");
-      db.updateGame(game);
-      return game;
-    });
+    try {
+      return http.get(Uri.encodeFull("$API_ENDPOINT/d/$key"),
+          headers: {"Accept": "application/json"}).then((response) {
+        if (response.statusCode != 200) return null;
+        var body = json.decode(response.body);
+        if (!body["valid"]) return null;
+        if (body["json"] != "") {
+          body["json"] = utf8.decode(base64.decode(body["json"]));
+        }
+        Game game = Game.fromMap(body);
+        db.updateGame(game);
+        return game;
+      });
+    } on SocketException {
+      return null;
+    }
   }
 
   Future<bool> _getSearch() {
@@ -156,13 +164,19 @@ class GameBLoC {
 
   Future<List<Game>> getGames(String url, [int offset = 0]) async {
     debugPrint('url $url');
-    return http.get(Uri.encodeFull(url),
-        headers: {"Accept": "application/json"}).then((response) {
-      var body = json.decode(response.body);
-      List<Game> games =
-          body["results"].map<Game>((json) => Game.fromMap(json)).toList();
-      return db.backfillGames(games);
-    });
+    try {
+      return http.get(Uri.encodeFull(url),
+          headers: {"Accept": "application/json"}).then((response) {
+        if (response.statusCode != 200) return [];
+        var body = json.decode(response.body);
+        List<Game> games =
+            body["results"].map<Game>((json) => Game.fromMap(json)).toList();
+        return db.backfillGames(games);
+      });
+    } on SocketException {
+      debugPrint('offline');
+    }
+    return [];
   }
 
   Future<List<Game>> getSearch([int offset = 0]) async {
@@ -180,15 +194,53 @@ class GameBLoC {
     return db.getFavoriteGames(offset);
   }
 
-  // TODO: Add logging to FB
-  viewGame(Game game, context) async {
-    debugPrint("Here thugh");
+  viewGame(Game game, context, [String caller = "home"]) async {
+    analytics.logEvent(
+      name: "start",
+      parameters: <String, dynamic>{
+        'game': game.hash,
+        'title': game.name,
+        'plays': game.plays,
+        'caller': caller,
+      },
+    );
     if (game != null) {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => GameScreen(game: game, bloc: this)));
     }
+  }
+
+  toggleLike(Game game, [String caller = "home"]) async {
+    game.favourited = !game.favourited;
+    saveGame(game).then((game) {
+      favoriteChannel.request();
+    });
+    var like = game.favourited ? "like" : "unlike";
+    analytics.logEvent(
+      name: like,
+      parameters: <String, dynamic>{
+        'game': game.hash,
+        'plays': game.plays,
+        'context': "home",
+      },
+    );
+  }
+
+  Future<String> setImage(Game game, String key, String value) async {
+    return db.setImage(game, key, value).then((data) {
+      if (data == null) {
+        return BLACK_PIXEL;
+      }
+      game.images.add(key.replaceAll("|", ""));
+      saveGame(game);
+      return data;
+    });
+  }
+
+  Future<String> getImage(Game game, String key) async {
+    return db.getImage(game, key).then((data) => data ?? BLACK_PIXEL);
   }
 
   dispose() {

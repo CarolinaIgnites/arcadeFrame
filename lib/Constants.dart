@@ -12,9 +12,17 @@ const String GAME_ASSET = "assets/game/game.html";
 // ████████████▀░░░░░▀█████████████
 // ░▀▀▀▀▀▀▀▀▀░░░░░░░░░░░▀▀▀▀▀▀▀▀▀░░
 const String JS_MUSTACHE = "assets/the.stache.js";
-//published games have the prefix "published_"
-const int KEY_OFFSET = 10;
-const int KEY_SIZE = 16;
+// published games have the prefix "published_"
+const String PUBLISHED = "published_";
+const int KEY_OFFSET = PUBLISHED.length; // = 10
+
+// A single black pixel (█) in base64, incase image caching breaks.
+const String BLACK_PIXEL = "data:image/gif;base64,"
+    "R0lGODlhA"
+    "QABAIAAAA"
+    "UEBAAAACw"
+    "AAAAAAQAB"
+    "AAACAkQBADs=";
 
 // @media screen is needed, because only 1 rule at a time can be added to a
 // style sheet. However, this way, bulk rules can be added.
@@ -38,5 +46,15 @@ const List<List<String>> JS_ASSETS_BY_PRIORITY = [
 ];
 const List<List<String>> CSS_ASSETS_BY_PRIORITY = [
   ["assets/game/css/minimal.css"],
-  ["assets/game/css/gameframe.css"],
+  ["assets/game/css/gameframe.css", "assets/game/css/arcadeframe.css"],
 ];
+
+// Information pages in Nav Drawer
+const String ABOUT_PAGE = "assets/pages/about.md";
+const String FAQ_PAGE = "assets/pages/faq.md";
+const String LEGAL_PAGE = "assets/pages/legal.md";
+const String PRIVACY_PAGE = "assets/pages/privacy.md";
+const String LICENSE_PAGE = "assets/pages/license.md";
+
+// Max size of elements on the home page.
+const double VIEW_SIZE = 600;

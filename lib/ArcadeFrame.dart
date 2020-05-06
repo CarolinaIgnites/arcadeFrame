@@ -9,12 +9,11 @@ import "components/Nav.dart";
 import "components/Header.dart";
 import "components/Drawer.dart";
 
+import 'package:games_services/games_services.dart';
+import 'package:games_services/achievement.dart';
+
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
-
-import 'package:firebase_analytics/firebase_analytics.dart';
-
-final FirebaseAnalytics analytics = FirebaseAnalytics();
 
 class ArcadeFrame extends StatelessWidget {
   @override
@@ -40,6 +39,7 @@ class _HomeScreenState extends State<_HomeScreen> {
   void initState() {
     super.initState();
 
+    GamesServices.signIn();
     bloc = GameBLoC();
     initUniLinks();
   }
@@ -80,7 +80,9 @@ class _HomeScreenState extends State<_HomeScreen> {
     Game game = await bloc.queryGame(segs[1]);
     if (game == null) return;
 
-    bloc.viewGame(game, context);
+    GamesServices.unlock(
+        achievement: Achievement(androidID: 'CgkI_LTI16kKEAIQAQ'));
+    bloc.viewGame(game, context, "QR");
   }
 
   @override
@@ -106,13 +108,18 @@ class _HomeScreenState extends State<_HomeScreen> {
                   new SliverPadding(
                       padding: EdgeInsets.only(top: 64),
                       sliver: new IgniteSection(
-                          title: "Favorites", channel: bloc.favoriteChannel)),
+                          title: "Favorites",
+                          channel: bloc.favoriteChannel,
+                          hideable: true)),
                   new IgniteSection(
-                      title: "Popular Games", channel: bloc.popularChannel),
+                      title: "Popular Games",
+                      channel: bloc.popularChannel,
+                      missing_message: ":( \n offline..."),
                   new IgniteSection(
                       title: "Search Results",
                       channel: bloc.searchChannel,
-                      visible: false),
+                      visible: false,
+                      missing_message: ":( \n no \n results"),
                 ])
               ])),
           onRefresh: refreshList,

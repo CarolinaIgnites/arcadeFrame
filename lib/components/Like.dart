@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flare_flutter/flare_actor.dart';
 
 import "../Game.dart";
 import "../GameBLoC.dart";
@@ -6,12 +7,14 @@ import "../GameBLoC.dart";
 class Like extends StatefulWidget {
   Like(
     this.game,
-    this.bloc, {
+    this.bloc,
+    this.paused, {
     Key key,
   }) : super(key: key);
 
   final Game game;
   final GameBLoC bloc;
+  final bool paused;
 
   @override
   State createState() => new _LikeState();
@@ -29,13 +32,19 @@ class _LikeState extends State<Like> {
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-        child: Text(faved ? "FAVED" : "FAV"),
+        child: Container(
+            width: 32,
+            height: 32,
+            child: new FlareActor("assets/icons/heart.flr",
+                isPaused: widget.paused,
+                snapToEnd: widget.paused,
+                alignment: Alignment.center,
+                fit: BoxFit.contain,
+                animation: widget.game.favourited ^ widget.paused
+                    ? "Like"
+                    : "Unlike")),
         onPressed: () {
-          widget.game.favourited = !widget.game.favourited;
-          faved = widget.game.favourited;
-          widget.bloc.saveGame(widget.game).then((game) {
-            widget.bloc.favoriteChannel.request();
-          });
+          widget.bloc.toggleLike(widget.game);
         });
   }
 }

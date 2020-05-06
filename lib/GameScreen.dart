@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:webview_flutter/webview_flutter.dart' as wv;
 import 'package:flutter/services.dart';
-import 'package:auto_orientation/auto_orientation.dart';
+import 'package:share/share.dart';
 
+import "Analytics.dart";
 import "Game.dart";
 import "GameBLoC.dart";
 import "PageBuilder.dart";
+
+import "components/Report.dart";
 
 class GameScreen extends StatefulWidget {
   final Game game;
@@ -22,7 +24,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class GameScreenState extends State<GameScreen> {
-  final flutterWebViewPlugin = FlutterWebviewPlugin();
   final PageBuilder builder = PageBuilder();
   GameBLoC bloc;
 
@@ -37,7 +38,14 @@ class GameScreenState extends State<GameScreen> {
     return null;
   }
 
-  WebViewController _controller;
+  Future<void> dispatchEvent(String key, String data) {
+    return _controller.evaluateJavascript("(function(){"
+        "let event = new CustomEvent(`${key}`, {detail: { data: `${data}` }});"
+        "window.dispatchEvent(event);"
+        "})();");
+  }
+
+  wv.WebViewController _controller;
   @override
   void initState() {
     //get JS from webpacket
@@ -46,43 +54,103 @@ class GameScreenState extends State<GameScreen> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    AutoOrientation.landscapeRightMode();
     bloc = widget.bloc;
   }
 
   @override
   Widget build(BuildContext context) {
-    return new WebView(
+    return new wv.WebView(
         initialUrl: "",
-        javascriptMode: JavascriptMode.unrestricted,
+        javascriptMode: wv.JavascriptMode.unrestricted,
         gestureRecognizers: Set()
           ..add(Factory<VerticalDragGestureRecognizer>(
               () => VerticalDragGestureRecognizer()))
           ..add(Factory<HorizontalDragGestureRecognizer>(
               () => HorizontalDragGestureRecognizer())),
         javascriptChannels: Set.from([
-          JavascriptChannel(
+          wv.JavascriptChannel(
               name: 'SetScore',
-              onMessageReceived: (JavascriptMessage message) {
+              onMessageReceived: (wv.JavascriptMessage message) async {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
                   widget.game.highscore = highscore;
-                  debugPrint("the json ${widget.game.json}");
                   bloc.saveGame(widget.game);
                 }
               }),
-          JavascriptChannel(
+          wv.JavascriptChannel(
               name: 'GetScore',
-              // TODO: There's a bug where __highscore gets out of sync of
-              // game.highscore, and produces glitchy looking results. Could
-              // fix on gameframe side. 'await' does not fix race condition.
-              onMessageReceived: (JavascriptMessage message) async {
-                await _controller.evaluateJavascript(
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                _controller.evaluateJavascript(
                     "window.__highscore=${widget.game.highscore};");
-                return widget.game.highscore;
+              }),
+          wv.JavascriptChannel(
+              name: 'GameOver',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                var score = int.parse(message.message);
+                widget.game.plays += 1;
+                bloc.saveGame(widget.game);
+                analytics.logEvent(
+                  name: 'play',
+                  parameters: <String, dynamic>{
+                    'game': widget.game.hash,
+                    'title': widget.game.name,
+                    'plays': widget.game.plays,
+                    'highscore': widget.game.highscore,
+                    'score': score,
+                  },
+                );
+              }),
+          wv.JavascriptChannel(
+              name: 'SetCache',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                const String sep = "|";
+                List<String> key_value = message.message.split(sep);
+                String key = key_value[0];
+                String value = key_value.sublist(1).join(sep);
+                String data = await bloc.setImage(widget.game, key, value);
+                dispatchEvent("set|${key}", data);
+              }),
+          wv.JavascriptChannel(
+              name: 'GetCache',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                String key = message.message;
+                String data = await bloc.getImage(widget.game, key);
+                dispatchEvent(key, data);
+              }),
+          wv.JavascriptChannel(
+              name: 'ToggleLike',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                widget.bloc.toggleLike(widget.game, "in_game");
+              }),
+          wv.JavascriptChannel(
+              name: 'Report',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return IgniteReport();
+                    });
+              }),
+          wv.JavascriptChannel(
+              name: 'Share',
+              onMessageReceived: (wv.JavascriptMessage message) async {
+                Share.share(
+                    '${widget.game.name}: https://api.carolinaignites.org/app/${widget.game.hash}',
+                    subject: 'Try out this game:');
+                analytics.logEvent(
+                  name: 'share',
+                  parameters: <String, dynamic>{
+                    'game': widget.game.hash,
+                    'title': widget.game.name,
+                    'plays': widget.game.plays,
+                  },
+                );
               })
         ]),
-        onWebViewCreated: (WebViewController c) {
+        navigationDelegate: (wv.NavigationRequest request) {
+          return wv.NavigationDecision.prevent;
+        },
+        onWebViewCreated: (wv.WebViewController c) {
           _controller = c;
           builder.getPage().then((String page) {
             _controller.loadUrl(page);
@@ -95,11 +163,9 @@ class GameScreenState extends State<GameScreen> {
   void dispose() {
     super.dispose();
     isActive = false;
-    flutterWebViewPlugin.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AutoOrientation.portraitUpMode();
   }
 }

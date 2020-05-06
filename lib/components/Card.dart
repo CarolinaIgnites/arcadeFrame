@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flare_flutter/flare_actor.dart';
 
 import 'dart:async';
 import 'dart:math';
 
+import "../Constants.dart";
 import "../Colors.dart";
 import "../Game.dart";
 import "../GameBLoC.dart";
@@ -49,7 +49,6 @@ class _IgniteCardState extends State<IgniteCard> {
 
   _refresh(game) {
     _game = widget.bloc.getCurrentGame(game);
-    // paused = widget.game.favourited == _game.favourited;
     widget.game.favourited = _game.favourited;
     if (subscription != null) subscription.cancel();
     subscription = widget.bloc.registerGameListener(_game, update);
@@ -67,11 +66,13 @@ class _IgniteCardState extends State<IgniteCard> {
   @override
   Widget build(BuildContext context) {
     _refresh(widget.game);
+    double width = MediaQuery.of(context).size.width;
+    double adjustment = (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
     return new Card(
         color: BACKGROUND_COLOR,
-        margin: const EdgeInsets.only(
-          right: 30,
-          left: 50,
+        margin: EdgeInsets.only(
+          right: adjustment + 30,
+          left: adjustment + 50,
           top: 5,
           bottom: 5,
         ),
@@ -88,40 +89,21 @@ class _IgniteCardState extends State<IgniteCard> {
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   ListTile(
                     title: Text(_game.name),
-                    subtitle: Text("Subtitle"),
+                    subtitle: Text(_game.subtitle ?? ""),
                   ),
                   ButtonBar(
                     children: <Widget>[
                       FlatButton(
                         child: Text("HIGHSCORE: ${textify(_game.highscore)}",
                             style: TextStyle(fontFamily: "arcadeclassic")),
-                        onPressed: () {/* ... */},
+                        onPressed: () {/* TODO: Maybe show highset score. */},
                       ),
                       FlatButton(
                         child: Text("PLAYS: ${textify(_game.plays)}",
                             style: TextStyle(fontFamily: "arcadeclassic")),
-                        onPressed: () {/* ... */},
+                        onPressed: () {/* // TODO: Maybe show total plays */},
                       ),
-                      // TODO: Break out into own component.
-                      // new Like(_game, widget.bloc),
-                      FlatButton(
-                          child: Container(
-                              width: 32,
-                              height: 32,
-                              child: new FlareActor("assets/icons/heart.flr",
-                                  isPaused: paused,
-                                  snapToEnd: paused,
-                                  alignment: Alignment.center,
-                                  fit: BoxFit.contain,
-                                  animation: _game.favourited ^ paused
-                                      ? "Like"
-                                      : "Unlike")),
-                          onPressed: () {
-                            _game.favourited = !_game.favourited;
-                            widget.bloc.saveGame(_game).then((game) {
-                              widget.bloc.favoriteChannel.request();
-                            });
-                          })
+                      new Like(widget.game, widget.bloc, paused),
                     ],
                   ),
                 ]))));

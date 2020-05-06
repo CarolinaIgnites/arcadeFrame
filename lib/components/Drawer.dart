@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../Constants.dart';
+import 'Dialog.dart';
 
 class IgniteDrawer extends StatelessWidget {
   @override
@@ -6,18 +8,17 @@ class IgniteDrawer extends StatelessWidget {
     return new Drawer(
       child: ListView(
         children: <Widget>[
-          ListTile(
-            title: Text("About Us"),
-            trailing: Icon(Icons.arrow_forward),
+          new ListTile(
+            title: Text('Games'),
+            onTap: () {
+              Navigator.pop(context);
+            },
           ),
-          ListTile(
-            title: Text("Licenses"),
-            trailing: Icon(Icons.arrow_forward),
-          ),
-          ListTile(
-            title: Text("Privacy Policy"),
-            trailing: Icon(Icons.arrow_forward),
-          ),
+          new IgniteDialog(title: "About Us", page: ABOUT_PAGE),
+          new IgniteDialog(title: "FAQ", page: FAQ_PAGE),
+          new IgniteDialog(title: "Legal", page: LEGAL_PAGE),
+          new IgniteDialog(title: "Privacy Policy", page: PRIVACY_PAGE),
+          new IgniteDialog(title: "Licenses", page: LICENSE_PAGE),
         ],
       ),
     );
