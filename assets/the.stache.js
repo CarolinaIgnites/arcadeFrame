@@ -73,28 +73,24 @@
         GetScore.postMessage(0);
         return window.__highscore | 0;
       },
-      gameover_hook : function() { GameOver.postMessage(window.__highscore | 0); },
+      gameover_hook :
+          function() { GameOver.postMessage(window.__highscore | 0); },
       modal_hooks : [
         {
           "classes" : [ "report", "svg-icon", "svg-report" ],
           "onclick" : () => {
-            //let report = prompt("Help us understand the problem. What's wrong with this game?");
-            //if (report) {
-              Report.postMessage(0);
-              alert("Thanks. We'll look into it soon.");
-            //}
+            Report.postMessage(0);
           }
         },
         {
           "classes" : [ "share", "svg-icon", "svg-share" ],
-          "onclick" : () => {
-            Share.postMessage(0);
-          }
+          "onclick" : () => { Share.postMessage(0); }
         },
         {
           "classes" : likeClasses,
           "onclick" : () => {
-            let fav = document.querySelector(".fav").classList.toggle("svg-liked");
+            let fav =
+                document.querySelector(".fav").classList.toggle("svg-liked");
             ToggleLike.postMessage(0);
             faved = !faved;
           }

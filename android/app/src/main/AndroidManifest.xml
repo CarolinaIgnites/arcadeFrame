@@ -11,7 +11,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="ArcadeFrame"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -42,7 +42,7 @@
         <!-- Required for game services. -->
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"
-            android:value="354786876028" />
+            android:value="\u003354786876028" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
