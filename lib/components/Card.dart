@@ -43,6 +43,7 @@ class _IgniteCardState extends State<IgniteCard> {
   @override
   void initState() {
     super.initState();
+    print(widget.toString());
     _refresh(widget.game);
     paused = true;
   }

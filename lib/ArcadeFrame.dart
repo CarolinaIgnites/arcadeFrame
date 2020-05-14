@@ -19,6 +19,7 @@ class ArcadeFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: _HomeScreen(),
         theme: ThemeData(fontFamily: 'Helvetica') //default font for entire app
         );
@@ -84,6 +85,7 @@ class _HomeScreenState extends State<_HomeScreen> {
         achievement: Achievement(androidID: 'CgkI_LTI16kKEAIQAQ'));
     bloc.viewGame(game, context, "QR");
   }
+
 
   @override
   Widget build(BuildContext context) {

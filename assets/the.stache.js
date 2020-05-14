@@ -10,6 +10,10 @@
   document.body.style.position = "fixed";
   document.body.style.backgroundColor = "black";
 
+  var node = document.createElement("DIV");                 // Create a <li> node
+  node.id = "container";                         // Append the text to <li>
+  document.body.appendChild(node);     // Append <li> to <ul> with id="myList"
+
   document.querySelector("#container").innerHTML = window.atob(`{{{html}}}`);
 
   const CODE = window.atob(`{{{code}}}`);

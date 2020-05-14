@@ -90,6 +90,7 @@ class GameBLoC {
     try {
       return http.get(Uri.encodeFull("$API_ENDPOINT/d/$key"),
           headers: {"Accept": "application/json"}).then((response) {
+
         if (response.statusCode != 200) return null;
         var body = json.decode(response.body);
         if (!body["valid"]) return null;
@@ -97,6 +98,8 @@ class GameBLoC {
           body["json"] = utf8.decode(base64.decode(body["json"]));
         }
         Game game = Game.fromMap(body);
+        print("asdf");
+        print(game.json);
         db.updateGame(game);
         return game;
       });
