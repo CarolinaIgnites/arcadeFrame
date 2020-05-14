@@ -11,7 +11,9 @@ description: An app to easily play and manage CarolinaIgnites games.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+# For evey subsequent release, increment the build number. So you might have
+# something that looks like 5.3.8+203
+version: 1.0.2+3
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -79,7 +81,6 @@ flutter:
     - assets/game/css/minimal.css
     - assets/game/js/gameframe.js
     - assets/game/js/interactive-custom.js
-    - assets/game/js/jquery.min.js
     - assets/game/js/nipplejs.js
     - assets/game/js/physicsjs-full.min.js
     # Pages
