@@ -5,10 +5,14 @@ import 'package:webview_flutter/webview_flutter.dart' as wv;
 import 'package:flutter/services.dart';
 import 'package:share/share.dart';
 
+import 'package:games_services/games_services.dart';
+import 'package:games_services/models/score.dart';
+
 import "Analytics.dart";
 import "Game.dart";
 import "GameBLoC.dart";
 import "PageBuilder.dart";
+import "Constants.dart";
 
 import "components/Report.dart";
 
@@ -29,6 +33,7 @@ class GameScreenState extends State<GameScreen> {
 
   // To prevent double execution of code.
   bool isActive = false;
+  bool newScore = false;
 
   Future<void> _loadSources(String _unused) {
     if (!isActive) {
@@ -73,6 +78,7 @@ class GameScreenState extends State<GameScreen> {
               onMessageReceived: (wv.JavascriptMessage message) async {
                 var highscore = int.parse(message.message);
                 if (highscore > widget.game.highscore) {
+                  newScore = true;
                   widget.game.highscore = highscore;
                   bloc.saveGame(widget.game);
                 }
@@ -86,6 +92,7 @@ class GameScreenState extends State<GameScreen> {
           wv.JavascriptChannel(
               name: 'GameOver',
               onMessageReceived: (wv.JavascriptMessage message) async {
+                // TODO: Move some of this logic to BLoC
                 var score = int.parse(message.message);
                 widget.game.plays += 1;
                 bloc.saveGame(widget.game);
@@ -99,6 +106,23 @@ class GameScreenState extends State<GameScreen> {
                     'score': score,
                   },
                 );
+                if (newScore) {
+                  analytics.logPostScore(
+                    score: score,
+                    level: widget.game.plays,
+                    character: widget.game.hash,
+                  );
+                  if (LEADERBOARDS.containsKey(widget.game.hash)) {
+                    await widget.bloc.login();
+                    debugPrint(LEADERBOARDS[widget.game.hash]);
+                    GamesServices.submitScore(
+                        score: Score(
+                            androidLeaderboardID:
+                                LEADERBOARDS[widget.game.hash],
+                            value: score));
+                  }
+                }
+                newScore = false;
               }),
           wv.JavascriptChannel(
               name: 'SetCache',
@@ -128,7 +152,7 @@ class GameScreenState extends State<GameScreen> {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      return IgniteReport();
+                      return IgniteReport(game: widget.game);
                     });
               }),
           wv.JavascriptChannel(

@@ -58,3 +58,11 @@ const String LICENSE_PAGE = "assets/pages/license.md";
 
 // Max size of elements on the home page.
 const double VIEW_SIZE = 600;
+
+// Achievements
+const QR_ACHIEVEMENT = 'CgkI_LTI16kKEAIQAQ';
+
+const LEADERBOARDS = {
+// Star Catcher
+  "published_nD_x_c8EWaJIznh2": "CgkI_LTI16kKEAIQAg"
+};

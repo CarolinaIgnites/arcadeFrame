@@ -11,7 +11,9 @@ description: An app to easily play and manage CarolinaIgnites games.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+# For evey subsequent release, increment the build number. So you might have
+# something that looks like 5.3.8+203
+version: 1.0.2+3
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -31,22 +33,28 @@ dependencies:
   reflected_mustache: ^1.0.11
   flutter_markdown: ^0.3.5
   # Analytics
-  firebase_core: ^0.4.0+9
+  firebase_core: ^0.4.4+3
   firebase_analytics: ^5.0.11
   # Share
-  share: ^0.6.4
+  share: '>=0.6.4+2 <2.0.0'
   # UI
   flare_flutter:
   # Game services
-  games_services: ^0.2.6
+  games_services: ^0.2.10
   # QR code
   uni_links:
+  # Click on urls
   url_launcher:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.3"
 
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -68,18 +76,21 @@ flutter:
   # list giving the asset and other descriptors for the font. For
 
   assets:
+      # Images
     - assets/icons/gamepad.png
     - assets/icons/heart.flr
     - assets/card.png
     - assets/colors.png
+      # Main
     - assets/the.stache.js
     - assets/game/game.html
+      # Css deps
     - assets/game/css/arcadeframe.css
     - assets/game/css/gameframe.css
     - assets/game/css/minimal.css
+      # Js deps
     - assets/game/js/gameframe.js
     - assets/game/js/interactive-custom.js
-    - assets/game/js/jquery.min.js
     - assets/game/js/nipplejs.js
     - assets/game/js/physicsjs-full.min.js
     # Pages
@@ -93,9 +104,6 @@ flutter:
     - family: arcadeclassic
       fonts:
        - asset: assets/fonts/arcadeclassic.ttf
-    - family: Halo
-      fonts:
-       - asset: assets/fonts/halo.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

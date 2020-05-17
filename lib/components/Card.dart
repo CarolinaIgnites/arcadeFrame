@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:games_services/games_services.dart';
 
 import 'dart:async';
 import 'dart:math';
@@ -97,7 +98,12 @@ class _IgniteCardState extends State<IgniteCard> {
                       FlatButton(
                         child: Text("HIGHSCORE: ${textify(_game.highscore)}",
                             style: TextStyle(fontFamily: "arcadeclassic")),
-                        onPressed: () {/* TODO: Maybe show highset score. */},
+                        onPressed: () {
+                          if (widget.bloc.isSignedIn &&
+                              LEADERBOARDS.containsKey(widget.game.hash)) {
+                            GamesServices.showLeaderboards();
+                          }
+                        },
                       ),
                       FlatButton(
                         child: Text("PLAYS: ${textify(_game.plays)}",

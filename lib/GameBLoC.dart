@@ -12,6 +12,9 @@ import "GameScreen.dart";
 import "Database.dart";
 import "Constants.dart";
 
+import 'package:games_services/games_services.dart';
+import 'package:games_services/models/achievement.dart';
+
 class GameChannel {
   GameChannel(this.stream, this.request, this.context);
 
@@ -47,7 +50,8 @@ class GameBLoC {
   GameChannel searchChannel;
   GameChannel favoriteChannel;
   GameChannel popularChannel;
-  bool searching = false;
+  bool _searching = false;
+  bool _signedIn = false;
 
   GameBLoC() {
     db.initDB();
@@ -58,6 +62,14 @@ class GameBLoC {
         GameChannel(_favoriteStreamController.stream, _getFavorites, this);
     popularChannel =
         GameChannel(_popularStreamController.stream, _getPopulars, this);
+    login();
+  }
+
+  login() async {
+    _signedIn = (await GamesServices.signIn()) == "success";
+    if (_signedIn) {
+      analytics.logLogin();
+    }
   }
 
   StreamSubscription<Game> registerGameListener(
@@ -138,15 +150,15 @@ class GameBLoC {
       popularChannel.setVisibility(true);
       favoriteChannel.request();
       popularChannel.request();
-      searching = false;
+      _searching = false;
       return;
     }
 
-    if (!searching) {
+    if (!_searching) {
       favoriteChannel.setVisibility(false);
       popularChannel.setVisibility(false);
     }
-    searching = true;
+    _searching = true;
     searchChannel.setVisibility(true);
     searchChannel.request();
   }
@@ -207,6 +219,10 @@ class GameBLoC {
         'caller': caller,
       },
     );
+    if (caller == "QR" && _signedIn) {
+      analytics.logUnlockAchievement(id: QR_ACHIEVEMENT);
+      GamesServices.unlock(achievement: Achievement(androidID: QR_ACHIEVEMENT));
+    }
     if (game != null) {
       Navigator.push(
           context,
@@ -244,6 +260,14 @@ class GameBLoC {
 
   Future<String> getImage(Game game, String key) async {
     return db.getImage(game, key).then((data) => data ?? BLACK_PIXEL);
+  }
+
+  void launchAchievements() {
+    GamesServices.showAchievements();
+  }
+
+  bool get isSignedIn {
+    return _signedIn;
   }
 
   dispose() {
