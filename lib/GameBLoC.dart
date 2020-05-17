@@ -67,6 +67,7 @@ class GameBLoC {
 
   login() async {
     _signedIn = (await GamesServices.signIn()) == "success";
+    print(_signedIn);
     if (_signedIn) {
       analytics.logLogin();
     }
@@ -221,7 +222,7 @@ class GameBLoC {
     );
     if (caller == "QR" && _signedIn) {
       analytics.logUnlockAchievement(id: QR_ACHIEVEMENT);
-      GamesServices.unlock(achievement: Achievement(androidID: QR_ACHIEVEMENT));
+      GamesServices.unlock(achievement: Achievement(androidID: QR_ACHIEVEMENT, iOSID: QR_ACHIEVEMENT));
     }
     if (game != null) {
       Navigator.push(
