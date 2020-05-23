@@ -36,6 +36,7 @@ class GameScreenState extends State<GameScreen> {
   bool newScore = false;
 
   Future<void> _loadSources(String _unused) {
+
     if (!isActive) {
       isActive = true;
       return builder.loadSources(widget.game, _controller, bloc);

@@ -62,6 +62,7 @@ class _HomeScreenState extends State<_HomeScreen> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       Uri uri = await getInitialUri();
+      print("getinitialurl");
       await loadFromUri(uri);
     } on PlatformException {
       debugPrint("uri failed...");
@@ -73,16 +74,28 @@ class _HomeScreenState extends State<_HomeScreen> {
     if (uri == null) return;
     var segs = uri.pathSegments;
     if (segs.length != 2 && segs[0] != "app") return;
-
+    print(segs[1]);
     Game game = await bloc.queryGame(segs[1]);
-    if (game == null) return;
-
+    if (game == null) {
+      return;
+    }
     bloc.viewGame(game, context, "QR");
   }
 
 
   @override
   Widget build(BuildContext context) {
+    var devicePhysicalPixelWidth = MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio;
+    var headerPadding = (devicePhysicalPixelWidth > 1000) ? devicePhysicalPixelWidth * .05 : 64; //probably a tablet
+    print(devicePhysicalPixelWidth);
+
+    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
+    var padding = 0;
+    if (isPortrait) {
+
+    }
+
     // TODO: Use media queries to make more responsive.
     // final Orientation orientation = MediaQuery.of(context).orientation;
     // final bool isLandscape = orientation == Orientation.landscape;
@@ -102,7 +115,7 @@ class _HomeScreenState extends State<_HomeScreen> {
                 new IgniteHeader(scroll: scroll),
                 CustomScrollView(slivers: <Widget>[
                   new SliverPadding(
-                      padding: EdgeInsets.only(top: 64),
+                      padding: EdgeInsets.only(top: headerPadding.toDouble()),
                       sliver: new IgniteSection(
                           title: "Favorites",
                           channel: bloc.favoriteChannel,
