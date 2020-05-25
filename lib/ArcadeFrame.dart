@@ -86,15 +86,8 @@ class _HomeScreenState extends State<_HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var devicePhysicalPixelWidth = MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio;
-    var headerPadding = (devicePhysicalPixelWidth > 1000) ? devicePhysicalPixelWidth * .05 : 64; //probably a tablet
+    var headerPadding = (devicePhysicalPixelWidth > 1000) ? MediaQuery.of(context).size.width * 0.1 : 64; //2048 == iPad Pro width
     print(devicePhysicalPixelWidth);
-
-    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-
-    var padding = 0;
-    if (isPortrait) {
-
-    }
 
     // TODO: Use media queries to make more responsive.
     // final Orientation orientation = MediaQuery.of(context).orientation;

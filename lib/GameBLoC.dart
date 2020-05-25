@@ -100,33 +100,23 @@ class GameBLoC {
     if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
     }
-    print(key);
     try {
       return http.get(Uri.encodeFull("$API_ENDPOINT/d/$key"),
           headers: {"Accept": "application/json"}).then((response) {
-            print(response.request.toString());
-            print("query gamae");
         if (response.statusCode != 200) {
           print("statuscode!=200");
           return null;
         }
-        print("querygame2");
-        print(response.body);
         var body = json.decode(response.body);
-        print("asdfqueryggame4");
-        print(body);
         if (!body["valid"]) return null;
         if (body["json"] != "") {
           body["json"] = utf8.decode(base64.decode(body["json"]));
         }
         Game game = Game.fromMap(body);
-        print("asdf");
-        print(game.json);
         db.updateGame(game);
         return game;
       });
     } on SocketException {
-      print("asosdf");
       return null;
     }
   }
@@ -197,9 +187,6 @@ class GameBLoC {
         var body = json.decode(response.body);
         List<Game> games =
             body["results"].map<Game>((json) => Game.fromMap(json)).toList();
-        for (int i =0; i < games.length; i++) {
-          print(games[i].hash);
-        }
         return db.backfillGames(games);
       });
     } on SocketException {

@@ -1,18 +1,3 @@
-/* Portrait and Landscape */
-@media only screen
-  and (min-device-width: 1024px)
-  and (max-device-width: 1366px)
-  and (-webkit-min-device-pixel-ratio: 2) {
-.svg-icon {
-    position:relative;
-    bottom: -10000px;
-    content: " ";
-    height: 32px;
-    width: 32px;
-    display:inline-block;
-    margin-left: 25px;
-}
-}
 
 .svg-icon {
     position:relative;

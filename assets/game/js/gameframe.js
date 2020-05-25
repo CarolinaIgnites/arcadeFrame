@@ -174,12 +174,18 @@ var GameFrame;
 
     // So we need to calculate the proper scaled width
     // that should work well with every resolution
-    let ratio = canvas.width / canvas.height;
+    let ratio = canvas.width / canvas.height ;
     let width = height * ratio;
+
+    if (width > window.innerWidth) {
+        width = window.innerWidth;
+        height = width / ratio;
+    }
 
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-    canvas.style.left = ((window.innerWidth - width) / 2) + "px"
+    canvas.style.left = ((window.innerWidth - width) / 2) + "px";
+    canvas.style.top = ((window.innerHeight - height) /2) + "px";
 
     // if boundaries and running, update the boundaries
     if (started && GameFrame.prototype.boundaries) {
