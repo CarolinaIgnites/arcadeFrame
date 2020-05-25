@@ -69,7 +69,7 @@ class _IgniteCardState extends State<IgniteCard> {
     _refresh(widget.game);
     double width = MediaQuery.of(context).size.width;
     double adjustment = (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
-    print(widget.game.hash);
+
     return new Card(
         color: BACKGROUND_COLOR,
         margin: EdgeInsets.only(

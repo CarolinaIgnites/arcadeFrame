@@ -96,6 +96,7 @@ class GameBLoC {
 
   // Check if we already have the data, otherwise load it.
   Future<Game> queryGame(String hash) async {
+    print("queryGame - param hash: " + hash);
     String key = hash;
     if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
