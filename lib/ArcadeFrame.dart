@@ -59,10 +59,10 @@ class _HomeScreenState extends State<_HomeScreen> {
   }
 
   Future<Null> initUniLinks() async {
+    print("initUniLinks");
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       Uri uri = await getInitialUri();
-      print("getinitialurl");
       await loadFromUri(uri);
     } on PlatformException {
       debugPrint("uri failed...");
@@ -71,6 +71,7 @@ class _HomeScreenState extends State<_HomeScreen> {
   }
 
   loadFromUri(Uri uri) async {
+    print("loadFromUri");
     if (uri == null) return;
     var segs = uri.pathSegments;
     if (segs.length != 2 && segs[0] != "app") return;
