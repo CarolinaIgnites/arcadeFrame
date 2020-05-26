@@ -87,7 +87,7 @@ class _HomeScreenState extends State<_HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var devicePhysicalPixelWidth = MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio;
-    var headerPadding = (devicePhysicalPixelWidth > 1000) ? MediaQuery.of(context).size.width * 0.1 : 64; //2048 == iPad Pro width
+    var headerPadding = (devicePhysicalPixelWidth > 1000) ? MediaQuery.of(context).size.width * 0.15 : 64;
     print(devicePhysicalPixelWidth);
 
     // TODO: Use media queries to make more responsive.
