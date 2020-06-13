@@ -1,16 +1,9 @@
-# carolinaignites
+# CarolinaIgnites
 
-A new Flutter project.
+An app to host and play [CarolianIgnites Games](https://www.carolinaignites.org/) built with the [Carolina Ignites Editor](https://editor.carolinaignites.org/).
 
-## Getting Started
+Games are vetted before publishing through the [playstore](https://play.google.com/store/apps/details?id=org.carolinaignites.app&hl=en_US). iOS version currently undergoing compliance revisions.
 
-This project is a starting point for a Flutter application.
+Learn more about these games organizing for highscool outreach here:
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+[![Video showing Carolina Ignites](https://img.youtube.com/vi/2p_Du7OFAdw/0.jpg)](https://www.youtube.com/watch?v=2p_Du7OFAdw)
