@@ -83,7 +83,6 @@ class _IgniteSectionState extends State<IgniteSection> {
                             fontFamily: "arcadeclassic",
                             color: ARCADE_COLOR)));
               }
-
               return new IgniteCard(
                   snapshot.data[index - 1], widget.channel.context);
             },

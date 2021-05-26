@@ -19,6 +19,12 @@ class _IgniteHeaderState extends State<IgniteHeader> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double adjustment = (width > VIEW_SIZE) ? (width - VIEW_SIZE) / 2 : 0;
+
+    if (width > 1000) {
+      adjustment = adjustment / 2;
+    }
+
+
     return Stack(children: <Widget>[
       new Positioned(
           top: widget.scroll,

@@ -45,7 +45,6 @@ class PageBuilder {
 
   // Check if we already have the data, otherwise load it.
   Future<String> _queryGame(Game game, GameBLoC bloc) async {
-    debugPrint(game.json);
     if (game.json == null) {
       game = await bloc.queryGame(game.hash);
     }

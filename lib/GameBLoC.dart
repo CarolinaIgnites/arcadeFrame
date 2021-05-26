@@ -67,6 +67,7 @@ class GameBLoC {
 
   login() async {
     _signedIn = (await GamesServices.signIn()) == "success";
+    print(_signedIn);
     if (_signedIn) {
       analytics.logLogin();
     }
@@ -95,6 +96,7 @@ class GameBLoC {
 
   // Check if we already have the data, otherwise load it.
   Future<Game> queryGame(String hash) async {
+    print("queryGame - param hash: " + hash);
     String key = hash;
     if (key.substring(0, KEY_OFFSET) == PUBLISHED) {
       key = hash.substring(KEY_OFFSET);
@@ -102,7 +104,10 @@ class GameBLoC {
     try {
       return http.get(Uri.encodeFull("$API_ENDPOINT/d/$key"),
           headers: {"Accept": "application/json"}).then((response) {
-        if (response.statusCode != 200) return null;
+        if (response.statusCode != 200) {
+          print("statuscode!=200");
+          return null;
+        }
         var body = json.decode(response.body);
         if (!body["valid"]) return null;
         if (body["json"] != "") {
@@ -218,7 +223,7 @@ class GameBLoC {
     );
     if (caller == "QR" && _signedIn) {
       analytics.logUnlockAchievement(id: QR_ACHIEVEMENT);
-      GamesServices.unlock(achievement: Achievement(androidID: QR_ACHIEVEMENT));
+      GamesServices.unlock(achievement: Achievement(androidID: QR_ACHIEVEMENT, iOSID: QR_ACHIEVEMENT));
     }
     if (game != null) {
       Navigator.push(

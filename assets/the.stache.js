@@ -1,4 +1,5 @@
 {
+
   document.documentElement.style.margin = "0";
   document.documentElement.style.height = "100%";
   document.documentElement.style.overflow = "hidden";
@@ -10,8 +11,11 @@
   document.body.style.position = "fixed";
   document.body.style.backgroundColor = "black";
 
-  document.querySelector("#container").innerHTML = window.atob(`{{{html}}}`);
+  var node = document.createElement("DIV");                 // Create a <li> node
+  node.id = "container";                         // Append the text to <li>
+  document.body.appendChild(node);     // Append <li> to <ul> with id="myList"
 
+  document.querySelector("#container").innerHTML = window.atob(`{{{html}}}`);
   const CODE = window.atob(`{{{code}}}`);
   const META = (function() {
     let image_lookup = JSON.parse(window.atob(`{{{images}}}`));

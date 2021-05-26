@@ -101,6 +101,7 @@ class DBProvider {
       var saved = rows.map<Game>((row) => Game.fromRow(row));
       var savedHashes = Set<String>.from(saved.map<String>((g) => g.hash));
       var unsaved = games.where((g) => !savedHashes.contains(g.hash)).toList();
+
       return [...saved, ...unsaved];
     });
   }
